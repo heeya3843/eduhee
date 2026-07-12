@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>강의실 — 박경희 AI 교육 | eduhee.com</title>
+<meta name="robots" content="noindex">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+:root{--ink:#0F172A;--ink2:#1E293B;--sub:#64748B;--soft:#94A3B8;
+--cyan:#0891B2;--cyan-d:#0E7490;--cyan-l:#22D3EE;--cyan-p:#67E8F9;
+--bg:#F8FAFC;--card:#FFFFFF;--border:#E2E8F0;--shadow:0 1px 10px rgba(15,23,42,.05);--shadow-h:0 14px 34px rgba(15,23,42,.12)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow-x:hidden;-webkit-text-size-adjust:100%}
+body{font-family:'Pretendard Variable',-apple-system,'Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);line-height:1.68;-webkit-font-smoothing:antialiased}
+h1,h2,h3,p,li{word-break:keep-all;overflow-wrap:break-word}
+.wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+
+.hdr{background:var(--ink);border-bottom:1px solid rgba(255,255,255,.08)}
+.hdr .wrap{display:flex;align-items:center;gap:16px;padding:14px 24px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--cyan),var(--cyan-l));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#062A34}
+.logo-txt{color:#F1F5F9;font-weight:800;font-size:16px}
+.logo-txt span{color:var(--cyan-p);font-weight:600;font-size:12px;letter-spacing:1.2px;display:block;margin-top:-2px}
+.back{margin-left:auto;color:#CBD5E1;text-decoration:none;font-size:14px;font-weight:600;padding:8px 15px;border:1px solid rgba(255,255,255,.2);border-radius:999px;transition:.18s;white-space:nowrap}
+.back:hover{color:var(--cyan-p);border-color:var(--cyan-p)}
+
+/* ── gate ── */
+#gate{min-height:calc(100vh - 63px);display:flex;align-items:center;justify-content:center;padding:40px 24px}
+.gbox{background:#fff;border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow-h);padding:44px 40px;max-width:440px;width:100%;text-align:center}
+.gbox .lock{width:64px;height:64px;border-radius:18px;background:#ECFEFF;color:var(--cyan-d);display:flex;align-items:center;justify-content:center;font-size:29px;margin:0 auto 20px}
+.gbox h1{font-size:25px;font-weight:800;letter-spacing:-.6px}
+.gbox p{color:var(--sub);font-size:14.5px;margin-top:9px}
+.gform{margin-top:26px;display:flex;flex-direction:column;gap:10px}
+.gform input{font-family:inherit;font-size:16px;padding:14px 18px;border:1px solid var(--border);border-radius:12px;outline:none;transition:.18s;text-align:center;letter-spacing:1px}
+.gform input:focus{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(8,145,178,.1)}
+.gform button{font-family:inherit;font-size:15px;font-weight:700;padding:14px;border:none;border-radius:12px;background:var(--cyan);color:#fff;cursor:pointer;transition:.18s}
+.gform button:hover{background:var(--cyan-d)}
+#err{color:#DC2626;font-size:13.5px;font-weight:600;margin-top:12px;min-height:20px}
+.hint{margin-top:18px;font-size:12.5px;color:var(--soft);line-height:1.6}
+
+/* ── room ── */
+#room{display:none;padding:52px 0 80px}
+.rhead{text-align:center;margin-bottom:40px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:2.6px;color:var(--cyan);margin-bottom:9px}
+.rhead h1{font-size:31px;font-weight:800;letter-spacing:-.8px}
+.rhead p{color:var(--sub);font-size:15px;margin-top:9px}
+
+.course{margin-bottom:34px}
+.course-t{display:flex;align-items:center;gap:12px;padding-bottom:12px;margin-bottom:16px;border-bottom:2px solid var(--ink)}
+.course-t h2{font-size:19px;font-weight:800;letter-spacing:-.3px}
+.course-t .cnt{margin-left:auto;background:var(--ink);color:#fff;font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px}
+
+.item{display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:17px 20px;margin-bottom:10px;box-shadow:var(--shadow);transition:.2s;text-decoration:none;color:inherit}
+.item:hover{transform:translateY(-2px);box-shadow:var(--shadow-h);border-color:var(--cyan)}
+.item .tp{flex-shrink:0;width:52px;height:52px;border-radius:12px;background:#ECFEFF;color:var(--cyan-d);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;letter-spacing:.3px}
+.item .bd{flex:1;min-width:0}
+.item .bd b{display:block;font-size:15.5px;font-weight:700;letter-spacing:-.2px}
+.item .bd span{display:block;font-size:13.5px;color:var(--sub);margin-top:2px}
+.item .dt{flex-shrink:0;font-size:12.5px;color:var(--soft);font-weight:600}
+.item .go{flex-shrink:0;color:var(--cyan);font-size:20px;font-weight:700}
+
+.empty{text-align:center;background:#fff;border:1px dashed var(--line,#CBD5E1);border-radius:16px;padding:56px 24px;color:var(--sub)}
+.empty .ic{font-size:38px;margin-bottom:12px}
+.empty b{display:block;font-size:17px;color:var(--ink);font-weight:700;margin-bottom:6px}
+
+.logout{display:block;margin:34px auto 0;background:none;border:1px solid var(--border);color:var(--sub);font-family:inherit;font-size:13.5px;font-weight:600;padding:10px 22px;border-radius:999px;cursor:pointer;transition:.18s}
+.logout:hover{border-color:var(--cyan);color:var(--cyan)}
+
+footer{background:#0B1220;color:#64748B;font-size:13px;text-align:center;padding:30px 0}
+footer b{color:#CBD5E1}
+
+@media(max-width:600px){
+  .wrap{padding:0 16px}
+  .gbox{padding:34px 24px}
+  .gbox h1{font-size:21px}
+  .rhead h1{font-size:24px}
+  #room{padding:38px 0 60px}
+  .item{padding:14px 15px;gap:12px}
+  .item .tp{width:44px;height:44px;font-size:10.5px}
+  .item .bd b{font-size:14.5px}
+  .item .bd span{font-size:12.5px}
+  .item .dt{display:none}
+  .course-t h2{font-size:16.5px}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="wrap">
+    <a class="logo" href="index.html">
+      <span class="logo-mark">PK</span>
+      <span class="logo-txt">박경희 <span>AI EDUCATION · EDUHEE</span></span>
+    </a>
+    <a class="back" href="index.html">← 홈으로</a>
+  </div>
+</header>
+
+<!-- 암호 입력 -->
+<div id="gate">
+  <div class="gbox">
+    <div class="lock">🔐</div>
+    <h1>강의실</h1>
+    <p>교육생 전용 공간입니다.<br>강의 중 안내받은 암호를 입력해 주세요.</p>
+    <form class="gform" id="gform">
+      <input type="password" id="pw" placeholder="암호 입력" autocomplete="off" autofocus>
+      <button type="submit">입장하기</button>
+    </form>
+    <div id="err"></div>
+    <div class="hint">암호를 잊으셨다면 강사에게 문의해 주세요.<br>heeya3843@naver.com</div>
+  </div>
+</div>
+
+<!-- 강의실 -->
+<main id="room">
+  <div class="wrap">
+    <div class="rhead">
+      <div class="eyebrow">CLASSROOM</div>
+      <h1>강의실</h1>
+      <p>강의별 실습 자료와 프롬프트를 내려받으실 수 있습니다.</p>
+    </div>
+    <div id="list"></div>
+    <button class="logout" onclick="signOut()">나가기</button>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap"><b>박경희 (스텔라)</b> · AI 업무활용 강사 &nbsp;·&nbsp; © 2026 eduhee.com</div>
+</footer>
+
+<script src="materials.js"></script>
+<script>
+var KEY='eduhee_classroom_ok';
+
+function render(){
+  var box=document.getElementById('list');
+  if(!window.MATERIALS || !MATERIALS.length){
+    box.innerHTML='<div class="empty"><div class="ic">📭</div><b>아직 올라온 자료가 없습니다</b>강의 종료 후 실습 자료가 업로드됩니다.</div>';
+    return;
+  }
+  var groups={}, order=[];
+  MATERIALS.forEach(function(m){
+    var c=m.course||'기타 자료';
+    if(!groups[c]){groups[c]=[];order.push(c);}
+    groups[c].push(m);
+  });
+  var html='';
+  order.forEach(function(c){
+    var items=groups[c];
+    html+='<div class="course"><div class="course-t"><h2>'+esc(c)+'</h2><span class="cnt">'+items.length+'건</span></div>';
+    items.forEach(function(m){
+      var ext=(m.url||'').split('.').pop().toLowerCase();
+      var isFile=['pdf','pptx','ppt','hwp','hwpx','xlsx','xls','docx','zip'].indexOf(ext)>-1;
+      html+='<a class="item" href="'+esc(m.url||'#')+'" '+(isFile?'download':'target="_blank" rel="noopener"')+'>'
+          +'<span class="tp">'+esc(m.type||'파일')+'</span>'
+          +'<span class="bd"><b>'+esc(m.title||'제목 없음')+'</b><span>'+esc(m.desc||'')+'</span></span>'
+          +'<span class="dt">'+esc(m.date||'')+'</span>'
+          +'<span class="go">›</span></a>';
+    });
+    html+='</div>';
+  });
+  box.innerHTML=html;
+}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];});}
+
+function enter(){
+  document.getElementById('gate').style.display='none';
+  document.getElementById('room').style.display='block';
+  render();
+}
+function signOut(){
+  try{sessionStorage.removeItem(KEY);}catch(e){}
+  location.reload();
+}
+
+document.getElementById('gform').addEventListener('submit',function(e){
+  e.preventDefault();
+  var v=document.getElementById('pw').value.trim();
+  if(v===CLASSROOM_PASSWORD){
+    try{sessionStorage.setItem(KEY,'1');}catch(e){}
+    enter();
+  }else{
+    document.getElementById('err').textContent='암호가 맞지 않습니다. 다시 확인해 주세요.';
+    document.getElementById('pw').value='';
+    document.getElementById('pw').focus();
+  }
+});
+
+try{ if(sessionStorage.getItem(KEY)==='1') enter(); }catch(e){}
+</script>
+</body>
+</html>

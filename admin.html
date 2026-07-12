@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>관리자 — 강의실 자료 관리 | eduhee.com</title>
+<meta name="robots" content="noindex">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+:root{--ink:#0F172A;--ink2:#1E293B;--sub:#64748B;--soft:#94A3B8;
+--cyan:#0891B2;--cyan-d:#0E7490;--cyan-l:#22D3EE;--cyan-p:#67E8F9;
+--bg:#F8FAFC;--border:#E2E8F0;--red:#DC2626;
+--shadow:0 1px 10px rgba(15,23,42,.05);--shadow-h:0 14px 34px rgba(15,23,42,.12)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow-x:hidden;-webkit-text-size-adjust:100%}
+body{font-family:'Pretendard Variable',-apple-system,'Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);line-height:1.68;-webkit-font-smoothing:antialiased}
+h1,h2,h3,p,li{word-break:keep-all;overflow-wrap:break-word}
+.wrap{max-width:980px;margin:0 auto;padding:0 24px}
+
+.hdr{background:var(--ink)}
+.hdr .wrap{display:flex;align-items:center;gap:14px;padding:14px 24px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--cyan),var(--cyan-l));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#062A34}
+.logo-txt{color:#F1F5F9;font-weight:800;font-size:16px}
+.logo-txt span{color:var(--cyan-p);font-weight:600;font-size:12px;letter-spacing:1.2px;display:block;margin-top:-2px}
+.hlink{margin-left:auto;color:#CBD5E1;text-decoration:none;font-size:14px;font-weight:600;padding:8px 15px;border:1px solid rgba(255,255,255,.2);border-radius:999px;white-space:nowrap}
+.hlink:hover{color:var(--cyan-p);border-color:var(--cyan-p)}
+
+/* gate */
+#gate{min-height:calc(100vh - 63px);display:flex;align-items:center;justify-content:center;padding:40px 24px}
+.gbox{background:#fff;border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow-h);padding:44px 40px;max-width:420px;width:100%;text-align:center}
+.gbox .lock{width:64px;height:64px;border-radius:18px;background:#ECFEFF;color:var(--cyan-d);display:flex;align-items:center;justify-content:center;font-size:29px;margin:0 auto 20px}
+.gbox h1{font-size:24px;font-weight:800;letter-spacing:-.6px}
+.gbox p{color:var(--sub);font-size:14.5px;margin-top:9px}
+.gform{margin-top:24px;display:flex;flex-direction:column;gap:10px}
+.gform input{font-family:inherit;font-size:16px;padding:14px 18px;border:1px solid var(--border);border-radius:12px;outline:none;text-align:center;letter-spacing:3px}
+.gform input:focus{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(8,145,178,.1)}
+.gform button{font-family:inherit;font-size:15px;font-weight:700;padding:14px;border:none;border-radius:12px;background:var(--cyan);color:#fff;cursor:pointer}
+.gform button:hover{background:var(--cyan-d)}
+#err{color:var(--red);font-size:13.5px;font-weight:600;margin-top:12px;min-height:20px}
+
+/* admin */
+#admin{display:none;padding:44px 0 90px}
+.ahead{margin-bottom:28px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:2.6px;color:var(--cyan);margin-bottom:8px}
+.ahead h1{font-size:28px;font-weight:800;letter-spacing:-.7px}
+.ahead p{color:var(--sub);font-size:14.5px;margin-top:8px}
+
+.steps{background:#ECFEFF;border:1px solid #A5F3FC;border-radius:14px;padding:18px 22px;margin-bottom:26px}
+.steps b{display:block;font-size:14.5px;font-weight:800;color:var(--cyan-d);margin-bottom:6px}
+.steps ol{margin:0;padding-left:18px;font-size:13.5px;color:var(--ink2);line-height:1.9}
+
+.card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px;box-shadow:var(--shadow);margin-bottom:20px}
+.card h2{font-size:17px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+.card h2 .n{width:24px;height:24px;border-radius:7px;background:var(--ink);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:800}
+
+label{display:block;font-size:12.5px;font-weight:700;color:var(--sub);margin-bottom:5px}
+input[type=text],select,textarea{width:100%;font-family:inherit;font-size:14.5px;padding:11px 14px;border:1px solid var(--border);border-radius:10px;outline:none;background:#fff;color:var(--ink);transition:.15s}
+input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(8,145,178,.1)}
+textarea{resize:vertical;min-height:64px;line-height:1.6}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.row3{display:grid;grid-template-columns:1.4fr .6fr .8fr;gap:12px;margin-bottom:12px}
+.full{margin-bottom:12px}
+
+.btn{font-family:inherit;font-size:14px;font-weight:700;padding:12px 22px;border:none;border-radius:999px;cursor:pointer;transition:.18s}
+.btn-add{background:var(--cyan);color:#fff;width:100%;padding:14px}
+.btn-add:hover{background:var(--cyan-d)}
+.btn-save{background:var(--ink);color:#fff}
+.btn-save:hover{background:var(--cyan-d)}
+.btn-gray{background:#fff;color:var(--sub);border:1px solid var(--border)}
+.btn-gray:hover{border-color:var(--cyan);color:var(--cyan)}
+
+.item{display:flex;align-items:center;gap:14px;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:9px;background:#fff}
+.item .tp{flex-shrink:0;width:46px;height:46px;border-radius:10px;background:#ECFEFF;color:var(--cyan-d);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800}
+.item .bd{flex:1;min-width:0}
+.item .bd .c{font-size:11.5px;font-weight:800;color:var(--cyan);letter-spacing:.2px}
+.item .bd b{display:block;font-size:15px;font-weight:700}
+.item .bd span{display:block;font-size:12.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .del{flex-shrink:0;background:#FEF2F2;color:var(--red);border:1px solid #FECACA;font-family:inherit;font-size:12.5px;font-weight:700;padding:8px 14px;border-radius:999px;cursor:pointer}
+.item .del:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.mv{flex-shrink:0;display:flex;flex-direction:column;gap:2px}
+.mv button{background:#F1F5F9;border:1px solid var(--border);color:var(--sub);font-size:11px;line-height:1;padding:3px 7px;border-radius:6px;cursor:pointer}
+.mv button:hover{border-color:var(--cyan);color:var(--cyan)}
+.none{text-align:center;color:var(--sub);font-size:14px;padding:34px 0;border:1px dashed var(--border);border-radius:12px}
+
+.dlbar{position:sticky;bottom:0;background:rgba(248,250,252,.95);backdrop-filter:blur(8px);border-top:1px solid var(--border);padding:16px 0;margin-top:26px}
+.dlbar .wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dlbar .msg{flex:1;font-size:13.5px;color:var(--sub);min-width:200px}
+.dlbar .msg b{color:var(--ink)}
+#done{display:none;background:#ECFDF5;border:1px solid #6EE7B7;color:#047857;border-radius:12px;padding:14px 18px;font-size:13.5px;font-weight:600;margin-top:14px;line-height:1.7}
+
+@media(max-width:700px){
+  .wrap{padding:0 16px}
+  .row,.row3{grid-template-columns:1fr}
+  .item{flex-wrap:wrap}
+  .item .bd{flex:1 1 100%;order:2}
+  .gbox{padding:34px 24px}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="wrap">
+    <a class="logo" href="index.html">
+      <span class="logo-mark">PK</span>
+      <span class="logo-txt">박경희 <span>ADMIN · EDUHEE</span></span>
+    </a>
+    <a class="hlink" href="index.html">← 홈으로</a>
+  </div>
+</header>
+
+<!-- 암호 -->
+<div id="gate">
+  <div class="gbox">
+    <div class="lock">⚙️</div>
+    <h1>관리자</h1>
+    <p>강의실 자료를 관리하는 화면입니다.<br>관리자 암호를 입력해 주세요.</p>
+    <form class="gform" id="gform">
+      <input type="password" id="pw" placeholder="••••" autocomplete="off" autofocus>
+      <button type="submit">들어가기</button>
+    </form>
+    <div id="err"></div>
+  </div>
+</div>
+
+<!-- 관리자 -->
+<main id="admin">
+  <div class="wrap">
+    <div class="ahead">
+      <div class="eyebrow">ADMIN</div>
+      <h1>강의실 자료 관리</h1>
+      <p>여기서 자료를 추가·삭제한 뒤, 아래 <b>[materials.js 내려받기]</b>를 눌러 파일을 교체하면 강의실에 반영됩니다.</p>
+    </div>
+
+    <div class="steps">
+      <b>📌 자료 올리는 순서</b>
+      <ol>
+        <li>올릴 파일(PDF·PPT·한글 등)을 사이트 폴더 안 <b>files</b> 폴더에 복사해 넣습니다.</li>
+        <li>아래에서 자료를 추가합니다. 파일 경로는 <b>files/파일이름.pdf</b> 형식으로 적습니다.</li>
+        <li><b>[materials.js 내려받기]</b> → 받은 파일을 사이트 폴더의 기존 materials.js 위에 덮어씁니다.</li>
+        <li>사이트 폴더 전체를 Vercel에 다시 업로드하면 끝입니다.</li>
+      </ol>
+    </div>
+
+    <!-- 자료 추가 -->
+    <div class="card">
+      <h2><span class="n">1</span> 자료 추가</h2>
+      <div class="row">
+        <div>
+          <label>강의명 (같은 이름끼리 묶여서 표시됩니다)</label>
+          <input type="text" id="i_course" placeholder="예: 공공기관 AI 업무활용 (기본)" list="courses">
+          <datalist id="courses"></datalist>
+        </div>
+        <div>
+          <label>자료 제목</label>
+          <input type="text" id="i_title" placeholder="예: 1일차 실습 워크북">
+        </div>
+      </div>
+      <div class="full">
+        <label>한 줄 설명</label>
+        <input type="text" id="i_desc" placeholder="예: 강의 중 따라하는 실습 책자입니다.">
+      </div>
+      <div class="row3">
+        <div>
+          <label>파일 경로 또는 웹주소</label>
+          <input type="text" id="i_url" placeholder="files/workbook.pdf 또는 https://...">
+        </div>
+        <div>
+          <label>종류</label>
+          <select id="i_type">
+            <option>PDF</option><option>PPT</option><option>HWP</option>
+            <option>XLSX</option><option>영상</option><option>링크</option>
+          </select>
+        </div>
+        <div>
+          <label>날짜</label>
+          <input type="text" id="i_date" placeholder="2026.07">
+        </div>
+      </div>
+      <button class="btn btn-add" onclick="addItem()">+ 목록에 추가</button>
+    </div>
+
+    <!-- 현재 목록 -->
+    <div class="card">
+      <h2><span class="n">2</span> 현재 강의실 자료 <span id="cnt" style="margin-left:auto;font-size:13px;color:var(--sub);font-weight:600"></span></h2>
+      <div id="list"></div>
+    </div>
+
+    <!-- 암호 -->
+    <div class="card">
+      <h2><span class="n">3</span> 강의실 암호</h2>
+      <label>교육생에게 알려줄 암호</label>
+      <input type="text" id="i_pw" style="max-width:300px">
+      <p style="font-size:12.5px;color:var(--sub);margin-top:8px">※ 관리자 암호(이 화면)는 admin.html 파일 안에서 바꿀 수 있습니다.</p>
+    </div>
+
+    <div id="done"></div>
+  </div>
+
+  <div class="dlbar">
+    <div class="wrap">
+      <div class="msg">변경한 내용은 <b>파일을 내려받아 교체해야</b> 저장됩니다.</div>
+      <button class="btn btn-gray" onclick="location.reload()">되돌리기</button>
+      <button class="btn btn-save" onclick="download()">⬇ materials.js 내려받기</button>
+    </div>
+  </div>
+</main>
+
+<script src="materials.js"></script>
+<script>
+var ADMIN_PASSWORD = '4911';   /* ← 관리자 암호. 바꾸려면 이 따옴표 안만 고치세요 */
+
+var DATA = [], PW = '';
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];});}
+function q(id){return document.getElementById(id);}
+
+function render(){
+  var box=q('list');
+  q('cnt').textContent = DATA.length ? DATA.length+'건' : '';
+  var names={}; DATA.forEach(function(m){names[m.course]=1;});
+  q('courses').innerHTML = Object.keys(names).map(function(n){return '<option value="'+esc(n)+'">';}).join('');
+
+  if(!DATA.length){ box.innerHTML='<div class="none">아직 등록된 자료가 없습니다. 위에서 추가해 보세요.</div>'; return; }
+  box.innerHTML = DATA.map(function(m,i){
+    return '<div class="item">'
+      +'<span class="tp">'+esc(m.type)+'</span>'
+      +'<span class="bd"><span class="c">'+esc(m.course)+'</span><b>'+esc(m.title)+'</b><span>'+esc(m.url)+(m.date?' · '+esc(m.date):'')+'</span></span>'
+      +'<span class="mv"><button onclick="move('+i+',-1)" title="위로">▲</button><button onclick="move('+i+',1)" title="아래로">▼</button></span>'
+      +'<button class="del" onclick="del('+i+')">삭제</button>'
+      +'</div>';
+  }).join('');
+}
+
+function addItem(){
+  var c=q('i_course').value.trim(), t=q('i_title').value.trim(), u=q('i_url').value.trim();
+  if(!c||!t||!u){ alert('강의명 · 자료 제목 · 파일 경로는 반드시 입력해 주세요.'); return; }
+  DATA.push({course:c, title:t, desc:q('i_desc').value.trim(), type:q('i_type').value, url:u, date:q('i_date').value.trim()});
+  q('i_title').value=''; q('i_desc').value=''; q('i_url').value='';
+  render();
+  q('i_title').focus();
+}
+function del(i){ if(confirm('이 자료를 목록에서 지울까요?\n\n'+DATA[i].title)){ DATA.splice(i,1); render(); } }
+function move(i,d){
+  var j=i+d; if(j<0||j>=DATA.length) return;
+  var t=DATA[i]; DATA[i]=DATA[j]; DATA[j]=t; render();
+}
+
+function jsq(s){ return "'" + String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ') + "'"; }
+
+function buildFile(){
+  var head =
+'/* ══════════════════════════════════════════════════════════════\n'+
+'   강의실 자료 목록  —  관리자 페이지(admin.html)에서 자동 생성된 파일입니다.\n'+
+'   손으로 고쳐도 되지만, 관리자 페이지에서 관리하시는 편이 편합니다.\n'+
+'   ══════════════════════════════════════════════════════════════ */\n\n'+
+"const CLASSROOM_PASSWORD = " + jsq(q('i_pw').value.trim() || PW) + ";\n\n"+
+'const MATERIALS = [\n';
+  var body = DATA.map(function(m){
+    return '\n  {\n'
+      +'    course: '+jsq(m.course)+',\n'
+      +'    title:  '+jsq(m.title)+',\n'
+      +'    desc:   '+jsq(m.desc)+',\n'
+      +'    type:   '+jsq(m.type)+',\n'
+      +'    url:    '+jsq(m.url)+',\n'
+      +'    date:   '+jsq(m.date)+',\n'
+      +'  },\n';
+  }).join('');
+  return head + body + '\n];\n';
+}
+
+function download(){
+  var blob=new Blob([buildFile()],{type:'text/javascript;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='materials.js';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
+  var d=q('done');
+  d.style.display='block';
+  d.innerHTML='✅ <b>materials.js</b> 를 내려받았습니다.<br>다운로드 폴더의 이 파일을 사이트 폴더(eduhee_site) 안 기존 materials.js 위에 덮어쓴 뒤, 폴더 전체를 Vercel에 다시 업로드하세요.';
+  d.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function enter(){
+  q('gate').style.display='none';
+  q('admin').style.display='block';
+  DATA = (window.MATERIALS||[]).map(function(m){return {course:m.course||'',title:m.title||'',desc:m.desc||'',type:m.type||'PDF',url:m.url||'',date:m.date||''};});
+  PW = window.CLASSROOM_PASSWORD || '';
+  q('i_pw').value = PW;
+  render();
+}
+
+q('gform').addEventListener('submit',function(e){
+  e.preventDefault();
+  if(q('pw').value.trim()===ADMIN_PASSWORD){
+    try{sessionStorage.setItem('eduhee_admin_ok','1');}catch(err){}
+    enter();
+  }else{
+    q('err').textContent='암호가 맞지 않습니다.';
+    q('pw').value=''; q('pw').focus();
+  }
+});
+
+try{ if(sessionStorage.getItem('eduhee_admin_ok')==='1') enter(); }catch(e){}
+</script>
+</body>
+</html>
