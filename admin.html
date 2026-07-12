@@ -286,8 +286,9 @@ function download(){
 function enter(){
   q('gate').style.display='none';
   q('admin').style.display='block';
-  DATA = (window.MATERIALS||[]).map(function(m){return {course:m.course||'',title:m.title||'',desc:m.desc||'',type:m.type||'PDF',url:m.url||'',date:m.date||''};});
-  PW = window.CLASSROOM_PASSWORD || '';
+  var SRC = (typeof MATERIALS !== 'undefined' && MATERIALS) ? MATERIALS : [];
+  DATA = SRC.map(function(m){return {course:m.course||'',title:m.title||'',desc:m.desc||'',type:m.type||'PDF',url:m.url||'',date:m.date||''};});
+  PW = (typeof CLASSROOM_PASSWORD !== 'undefined') ? CLASSROOM_PASSWORD : '';
   q('i_pw').value = PW;
   render();
 }

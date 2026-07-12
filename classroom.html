@@ -135,7 +135,7 @@ var KEY='eduhee_classroom_ok';
 
 function render(){
   var box=document.getElementById('list');
-  if(!window.MATERIALS || !MATERIALS.length){
+  if(typeof MATERIALS === 'undefined' || !MATERIALS.length){
     box.innerHTML='<div class="empty"><div class="ic">📭</div><b>아직 올라온 자료가 없습니다</b>강의 종료 후 실습 자료가 업로드됩니다.</div>';
     return;
   }
