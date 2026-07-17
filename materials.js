@@ -29,27 +29,27 @@ const MATERIALS = [
   {
     course: '청소년 진로특강 (꿈파쇼)',
     title:  '공무원 진짜 이야기 — 중학생 진로특강',
-    desc:   '현직 공무원이 들려주는 진짜 직업 이야기. 강의 발표자료 전체 (32슬라이드)',
-    type:   'PPT',
-    url:    'files/youth_career_2026.pptx',
+    desc:   '현직 공무원이 들려주는 진짜 직업 이야기. 강의 발표자료 전체 (32쪽)',
+    type:   'PDF',
+    url:    'files/youth_career_2026.pdf',
     date:   '2026.07',
   },
 
   {
     course: '울산과학대학교 교직원 AI 활용 워크샵',
     title:  '교직원 AI 활용교육 — 발표자료',
-    desc:   '울산과학대학교 교직원 대상 AI 업무활용 워크샵 발표자료 전체 (44슬라이드)',
-    type:   'PPT',
-    url:    'files/usc_ai_workshop_2026.pptx',
+    desc:   '울산과학대학교 교직원 대상 AI 업무활용 워크샵 발표자료 전체 (44쪽)',
+    type:   'PDF',
+    url:    'files/usc_ai_workshop_2026.pdf',
     date:   '2026.06',
   },
 
   {
     course: '한국중부발전 (보령) AI 활용교육',
     title:  'AI로 일하는 방법',
-    desc:   '한국중부발전 임직원 대상 AI 업무활용 강의자료 전체 (40슬라이드)',
-    type:   'PPT',
-    url:    'files/joongbu_ai_work_2026.pptx',
+    desc:   '한국중부발전 임직원 대상 AI 업무활용 강의자료 전체 (40쪽)',
+    type:   'PDF',
+    url:    'files/joongbu_ai_work_2026.pdf',
     date:   '2026.06',
   },
 
