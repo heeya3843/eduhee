@@ -45,6 +45,24 @@ const MATERIALS = [
   },
 
   {
+    course: '울산과학대학교 교직원 AI 활용 워크샵',
+    title:  '클로드 AI 실습 자료',
+    desc:   'Claude AI 실습 단계별 따라하기 자료 (47쪽)',
+    type:   'PDF',
+    url:    'files/usc_claude_practice_2026.pdf',
+    date:   '2026.06',
+  },
+
+  {
+    course: '울산과학대학교 교직원 AI 활용 워크샵',
+    title:  '교수님용 Claude AI 프롬프트 모음집',
+    desc:   '복사–붙여넣기 실전 프롬프트 모음 (논문리뷰·강의계획서·Projects 등, 12쪽)',
+    type:   'PDF',
+    url:    'files/usc_prompts_2026.pdf',
+    date:   '2026.06',
+  },
+
+  {
     course: '한국중부발전 (보령) AI 활용교육',
     title:  'AI로 일하는 방법',
     desc:   '한국중부발전 임직원 대상 AI 업무활용 강의자료 전체 (40쪽)',
