@@ -55,15 +55,6 @@ const MATERIALS = [
 
   {
     course: '울산과학대학교 교직원 AI 활용 워크샵',
-    title:  '교수님용 Claude AI 프롬프트 모음집',
-    desc:   '복사–붙여넣기 실전 프롬프트 모음 (논문리뷰·강의계획서·Projects 등, 12쪽)',
-    type:   'PDF',
-    url:    'files/usc_prompts_2026.pdf',
-    date:   '2026.06',
-  },
-
-  {
-    course: '울산과학대학교 교직원 AI 활용 워크샵',
     title:  '교수 AI 활용 — 젠스파크 제작 자료',
     desc:   '젠스파크(Genspark)로 만든 교수 대상 AI 활용 발표자료 (25쪽)',
     type:   'PDF',
@@ -77,6 +68,16 @@ const MATERIALS = [
     desc:   '한국중부발전 임직원 대상 AI 업무활용 강의자료 전체 (40쪽)',
     type:   'PDF',
     url:    'files/joongbu_ai_work_2026.pdf',
+    date:   '2026.06',
+  },
+
+  /* ── 프롬프트 모음집 (강의안과 구분해 맨 아래 별도 섹션) ── */
+  {
+    course: '📋 프롬프트 모음집 (복사–붙여넣기용)',
+    title:  '교수님용 Claude AI 프롬프트 모음집',
+    desc:   '복사–붙여넣기 실전 프롬프트 모음 (논문리뷰·강의계획서·Projects 등, 12쪽)',
+    type:   'PDF',
+    url:    'files/usc_prompts_2026.pdf',
     date:   '2026.06',
   },
 
