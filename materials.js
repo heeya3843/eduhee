@@ -51,6 +51,7 @@ const MATERIALS = [
     type:   'PDF',
     url:    'files/usc_claude_practice_2026.pdf',
     date:   '2026.06',
+    hidden: true,
   },
 
   {
@@ -69,6 +70,7 @@ const MATERIALS = [
     type:   'PDF',
     url:    'files/joongbu_ai_work_2026.pdf',
     date:   '2026.06',
+    hidden: true,
   },
 
   /* ── 프롬프트 모음집 (강의안과 구분해 맨 아래 별도 섹션) ── */
@@ -79,6 +81,7 @@ const MATERIALS = [
     type:   'PDF',
     url:    'files/usc_prompts_2026.pdf',
     date:   '2026.06',
+    hidden: true,
   },
 
   {
