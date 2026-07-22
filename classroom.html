@@ -139,8 +139,13 @@ function render(){
     box.innerHTML='<div class="empty"><div class="ic">📭</div><b>아직 올라온 자료가 없습니다</b>강의 종료 후 실습 자료가 업로드됩니다.</div>';
     return;
   }
+  var visible=MATERIALS.filter(function(m){return !m.hidden;});
+  if(!visible.length){
+    box.innerHTML='<div class="empty"><div class="ic">📭</div><b>아직 공개된 자료가 없습니다</b>강의 종료 후 실습 자료가 공개됩니다.</div>';
+    return;
+  }
   var groups={}, order=[];
-  MATERIALS.forEach(function(m){
+  visible.forEach(function(m){
     var c=m.course||'기타 자료';
     if(!groups[c]){groups[c]=[];order.push(c);}
     groups[c].push(m);

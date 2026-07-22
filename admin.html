@@ -82,6 +82,11 @@ textarea{resize:vertical;min-height:64px;line-height:1.6}
 .mv button{background:#F1F5F9;border:1px solid var(--border);color:var(--sub);font-size:11px;line-height:1;padding:3px 7px;border-radius:6px;cursor:pointer}
 .mv button:hover{border-color:var(--cyan);color:var(--cyan)}
 .none{text-align:center;color:var(--sub);font-size:14px;padding:34px 0;border:1px dashed var(--border);border-radius:12px}
+.eye{flex-shrink:0;background:#ECFDF5;color:#047857;border:1px solid #6EE7B7;font-family:inherit;font-size:12.5px;font-weight:800;padding:8px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;min-width:74px}
+.eye:hover{filter:brightness(.97)}
+.eye.off{background:#FEF2F2;color:#B91C1C;border-color:#FECACA}
+.item-hidden{opacity:.5;background:#F8FAFC}
+.item-hidden .bd b{text-decoration:line-through;text-decoration-color:#CBD5E1}
 
 .dlbar{position:sticky;bottom:0;background:rgba(248,250,252,.95);backdrop-filter:blur(8px);border-top:1px solid var(--border);padding:16px 0;margin-top:26px}
 .dlbar .wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -134,12 +139,17 @@ textarea{resize:vertical;min-height:64px;line-height:1.6}
     </div>
 
     <div class="steps">
-      <b>📌 자료 올리는 순서</b>
+      <b>👁 보여줄 자료만 골라 공개하기</b>
       <ol>
-        <li>올릴 파일(PDF·PPT·한글 등)을 사이트 폴더 안 <b>files</b> 폴더에 복사해 넣습니다.</li>
-        <li>아래에서 자료를 추가합니다. 파일 경로는 <b>files/파일이름.pdf</b> 형식으로 적습니다.</li>
-        <li><b>[materials.js 내려받기]</b> → 받은 파일을 사이트 폴더의 기존 materials.js 위에 덮어씁니다.</li>
-        <li>사이트 폴더 전체를 Vercel에 다시 업로드하면 끝입니다.</li>
+        <li>아래 목록에서 각 자료 왼쪽 <b>👁 표시 / 🙈 숨김</b> 버튼을 눌러 강의실에 보일지 말지 정합니다.</li>
+        <li><b>🙈 숨김</b>으로 둔 자료는 교육생 강의실에서 <b>안 보입니다</b> (삭제가 아니라 잠시 숨김).</li>
+        <li>다 고른 뒤 아래 <b>[materials.js 내려받기]</b> → 받은 파일을 강사(제작자)에게 주시거나, 사이트 폴더의 materials.js 위에 덮어써 다시 올리면 반영됩니다.</li>
+      </ol>
+      <b style="margin-top:12px">📌 새 자료 추가 순서</b>
+      <ol>
+        <li>올릴 파일(PDF·PPT·한글 등)을 <b>files</b> 폴더에 넣습니다.</li>
+        <li>아래에서 자료를 추가합니다. 경로는 <b>files/파일이름.pdf</b> 형식으로 적습니다.</li>
+        <li><b>[materials.js 내려받기]</b> 후 반영합니다.</li>
       </ol>
     </div>
 
@@ -224,7 +234,9 @@ function render(){
 
   if(!DATA.length){ box.innerHTML='<div class="none">아직 등록된 자료가 없습니다. 위에서 추가해 보세요.</div>'; return; }
   box.innerHTML = DATA.map(function(m,i){
-    return '<div class="item">'
+    var hidden = !!m.hidden;
+    return '<div class="item'+(hidden?' item-hidden':'')+'">'
+      +'<button class="eye'+(hidden?' off':'')+'" onclick="toggleHide('+i+')" title="'+(hidden?'숨김 — 강의실에 안 보임':'표시 — 강의실에 보임')+'">'+(hidden?'🙈 숨김':'👁 표시')+'</button>'
       +'<span class="tp">'+esc(m.type)+'</span>'
       +'<span class="bd"><span class="c">'+esc(m.course)+'</span><b>'+esc(m.title)+'</b><span>'+esc(m.url)+(m.date?' · '+esc(m.date):'')+'</span></span>'
       +'<span class="mv"><button onclick="move('+i+',-1)" title="위로">▲</button><button onclick="move('+i+',1)" title="아래로">▼</button></span>'
@@ -232,6 +244,7 @@ function render(){
       +'</div>';
   }).join('');
 }
+function toggleHide(i){ DATA[i].hidden = !DATA[i].hidden; render(); }
 
 function addItem(){
   var c=q('i_course').value.trim(), t=q('i_title').value.trim(), u=q('i_url').value.trim();
@@ -265,6 +278,7 @@ function buildFile(){
       +'    type:   '+jsq(m.type)+',\n'
       +'    url:    '+jsq(m.url)+',\n'
       +'    date:   '+jsq(m.date)+',\n'
+      +(m.hidden ? '    hidden: true,\n' : '')
       +'  },\n';
   }).join('');
   return head + body + '\n];\n';
@@ -287,7 +301,7 @@ function enter(){
   q('gate').style.display='none';
   q('admin').style.display='block';
   var SRC = (typeof MATERIALS !== 'undefined' && MATERIALS) ? MATERIALS : [];
-  DATA = SRC.map(function(m){return {course:m.course||'',title:m.title||'',desc:m.desc||'',type:m.type||'PDF',url:m.url||'',date:m.date||''};});
+  DATA = SRC.map(function(m){return {course:m.course||'',title:m.title||'',desc:m.desc||'',type:m.type||'PDF',url:m.url||'',date:m.date||'',hidden:!!m.hidden};});
   PW = (typeof CLASSROOM_PASSWORD !== 'undefined') ? CLASSROOM_PASSWORD : '';
   q('i_pw').value = PW;
   render();
