@@ -103,4 +103,13 @@ const MATERIALS = [
     date:   '2026.07',
   },
 
+  {
+    course: '🛠 직접 만든 AI 도구 (바이브코딩)',
+    title:  '울산과학대학교 2027 입학설명회 (다국어)',
+    desc:   'ChatGPT로 만든 울산과학대 2027 입학홍보 웹페이지. 한국어 + 영어·중국어·베트남어 등 7개 언어 지원. 클릭하면 새 창에서 열립니다.',
+    type:   '웹',
+    url:    'https://ulsan-college-2027.heeya3843.chatgpt.site/',
+    date:   '2026.07',
+  },
+
 ];
