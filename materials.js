@@ -63,6 +63,15 @@ const MATERIALS = [
   },
 
   {
+    course: '울산과학대학교 교직원 AI 활용 워크샵',
+    title:  '교수 AI 활용 — 젠스파크 제작 자료',
+    desc:   '젠스파크(Genspark)로 만든 교수 대상 AI 활용 발표자료 (25쪽)',
+    type:   'PDF',
+    url:    'files/usc_genspark_2026.pdf',
+    date:   '2026.07',
+  },
+
+  {
     course: '한국중부발전 (보령) AI 활용교육',
     title:  'AI로 일하는 방법',
     desc:   '한국중부발전 임직원 대상 AI 업무활용 강의자료 전체 (40쪽)',
