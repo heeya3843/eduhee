@@ -56,7 +56,7 @@ const MATERIALS = [
 
   {
     course: '울산과학대학교 교직원 AI 활용 워크샵',
-    title:  '교수 AI 활용 — 젠스파크 제작 자료',
+    title:  '울산과학대학교 교직원 AI 활용 교육 — 젠스파크 제작 자료',
     desc:   '7월 23일 울산과학대학교 교직원 AI 활용 교육 강의 자료. 젠스파크(Genspark)로 제작 (25쪽)',
     type:   'PDF',
     url:    'files/usc_genspark_2026.pdf',
