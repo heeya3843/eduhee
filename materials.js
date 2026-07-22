@@ -91,6 +91,16 @@ const MATERIALS = [
     type:   '웹',
     url:    'files/usc_prompt_memo.html',
     date:   '2026.07',
+    hidden: true,
+  },
+
+  {
+    course: '📋 프롬프트 모음집 (복사–붙여넣기용)',
+    title:  '대화형 프롬프트 실습장 (바로 열기)',
+    desc:   'Claude로 만든 실습형 프롬프트 페이지. 실습용 영수증 3종·인구동태 데이터가 안에 들어있어 바로 따라 해볼 수 있습니다. 클릭하면 새 창에서 열립니다.',
+    type:   '웹',
+    url:    'files/usc_prompt_practice.html',
+    date:   '2026.07',
   },
 
   /* ── 바이브코딩으로 직접 만든 실습 도구 ── */
