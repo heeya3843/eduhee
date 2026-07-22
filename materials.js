@@ -81,4 +81,13 @@ const MATERIALS = [
     date:   '2026.06',
   },
 
+  {
+    course: '📋 프롬프트 모음집 (복사–붙여넣기용)',
+    title:  '프롬프트 탭형 메모장 (바로 열기)',
+    desc:   '울산과학대 교직원 AI 활용 프롬프트를 탭으로 모아둔 웹 메모장. 클릭하면 브라우저에서 바로 열립니다.',
+    type:   '웹',
+    url:    'files/usc_prompt_memo.html',
+    date:   '2026.07',
+  },
+
 ];
