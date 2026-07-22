@@ -60,7 +60,7 @@ const MATERIALS = [
     desc:   '젠스파크(Genspark)로 만든 교수 대상 AI 활용 발표자료 (25쪽)',
     type:   'PDF',
     url:    'files/usc_genspark_2026.pdf',
-    date:   '2026.07',
+    date:   '7.23. 강의자료',
   },
 
   {
@@ -97,6 +97,7 @@ const MATERIALS = [
   {
     course: '📋 프롬프트 모음집 (복사–붙여넣기용)',
     title:  '대화형 프롬프트 실습장 (바로 열기)',
+    tag:    '7.23. 실습 자료',
     desc:   'Claude로 만든 실습형 프롬프트 페이지. 실습용 영수증 3종·인구동태 데이터가 안에 들어있어 바로 따라 해볼 수 있습니다. 클릭하면 새 창에서 열립니다.',
     type:   '웹',
     url:    'files/usc_prompt_practice.html',
