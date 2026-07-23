@@ -107,8 +107,18 @@ const MATERIALS = [
   /* ── 바이브코딩으로 직접 만든 실습 도구 ── */
   {
     course: '🛠 직접 만든 AI 도구 (바이브코딩)',
-    title:  'EduHee Cut — 웹 영상 편집기',
-    desc:   '설치 없이 브라우저에서 바로 쓰는 영상 편집기. 자막·BGM·전환효과·필터 지원. 클릭하면 새 창에서 열립니다. (Chrome/Edge 권장)',
+    title:  '에듀희 영상편집기 (Claude 제작)',
+    tag:    'Claude',
+    desc:   'Claude로 만든 업그레이드 웹 영상편집기. 설치 없이 브라우저에서 바로 사용. 자막·BGM·전환효과·필터 지원. 클릭하면 새 창에서 열립니다. (Chrome/Edge 권장)',
+    type:   '웹',
+    url:    'files/eduhee_editor.html',
+    date:   '2026.07',
+  },
+
+  {
+    course: '🛠 직접 만든 AI 도구 (바이브코딩)',
+    title:  'EduHee Cut — 웹 영상 편집기 (Genspark 제작)',
+    desc:   '젠스파크로 만든 영상 편집기. 자막·BGM·전환효과·필터 지원. 클릭하면 새 창에서 열립니다. (Chrome/Edge 권장)',
     type:   '웹',
     url:    'https://97494ac5-d81a-4f8a-a93c-628994b156cd.vip.gensparksite.com/',
     date:   '2026.07',
