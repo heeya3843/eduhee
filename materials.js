@@ -134,14 +134,4 @@ const MATERIALS = [
     date:   '2026.07',
   },
 
-  {
-    course: '🎬 영상 실습 자료 (쇼츠 만들기)',
-    title:  '쇼츠 편집 소스 묶음 (내려받기)',
-    tag:    '7.23. 실습 자료',
-    desc:   '영상 클립 10개 + 나레이션 음원 7개 + 이미지가 담긴 zip. 내려받아 위의 EduHee Cut 편집기에 넣어 나만의 쇼츠를 만들어 보세요.',
-    type:   'ZIP',
-    url:    'files/usc_shorts_source.zip',
-    date:   '2026.07',
-  },
-
 ];
