@@ -197,9 +197,21 @@ textarea{resize:vertical;min-height:64px;line-height:1.6}
       <div id="list"></div>
     </div>
 
+    <!-- 후기 관리 -->
+    <div class="card">
+      <h2><span class="n">3</span> 강의 후기 관리
+        <span id="rvCnt" style="margin-left:auto;font-size:13px;color:var(--sub);font-weight:600"></span>
+      </h2>
+      <p style="font-size:13px;color:var(--sub);margin:-6px 0 14px">
+        새 후기는 <b>대기</b> 상태로 들어옵니다. <b>공개</b>를 누르면 홈페이지 후기 섹션에 바로 표시됩니다.
+        (이건 파일 내려받기 없이 <b>즉시 반영</b>됩니다.)
+      </p>
+      <div id="rvAdminList"><div class="none">불러오는 중…</div></div>
+    </div>
+
     <!-- 암호 -->
     <div class="card">
-      <h2><span class="n">3</span> 강의실 암호</h2>
+      <h2><span class="n">4</span> 강의실 암호</h2>
       <label>교육생에게 알려줄 암호</label>
       <input type="text" id="i_pw" style="max-width:300px">
       <p style="font-size:12.5px;color:var(--sub);margin-top:8px">※ 관리자 암호(이 화면)는 admin.html 파일 안에서 바꿀 수 있습니다.</p>
@@ -297,9 +309,56 @@ function download(){
   d.scrollIntoView({behavior:'smooth',block:'center'});
 }
 
+/* ══ 후기 관리 (Supabase) ══ */
+var SB_URL='https://yzycbpugeswycjouldmd.supabase.co';
+var SB_KEY='sb_publishable__8L_fRWrQQNhKjNDl60EGw_Bha5cuCv';
+
+function sbRpc(fn,body){
+  return fetch(SB_URL+'/rest/v1/rpc/'+fn,{
+    method:'POST',
+    headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+}
+function rvDate(s){ try{var d=new Date(s);return d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0');}catch(e){return '';} }
+
+function rvAdminLoad(){
+  var box=q('rvAdminList');
+  sbRpc('admin_list_reviews',{pw:ADMIN_PASSWORD})
+   .then(function(r){ return r.ok?r.json():Promise.reject(); })
+   .then(function(rows){
+      rows=rows||[];
+      var pend=rows.filter(function(x){return !x.approved;}).length;
+      q('rvCnt').textContent = rows.length ? (rows.length+'건'+(pend?' · 대기 '+pend:'')) : '';
+      if(!rows.length){ box.innerHTML='<div class="none">아직 등록된 후기가 없습니다.</div>'; return; }
+      box.innerHTML=rows.map(function(r){
+        var ok=r.approved;
+        return '<div class="item'+(ok?'':' item-hidden')+'">'
+          +'<button class="eye'+(ok?'':' off')+'" onclick="rvToggle(\''+r.id+'\','+(!ok)+')">'+(ok?'👁 공개':'⏳ 대기')+'</button>'
+          +'<span class="tp">'+'★'+r.rating+'</span>'
+          +'<span class="bd"><span class="c">'+esc(r.org||'소속 없음')+(r.course?' · '+esc(r.course):'')+'</span>'
+          +'<b>'+esc(r.name)+'</b><span>'+esc((r.content||'').replace(/\n/g,' ')).slice(0,90)+'</span></span>'
+          +'<span class="dt" style="flex-shrink:0;font-size:12px;color:var(--soft)">'+rvDate(r.created_at)+'</span>'
+          +'<button class="del" onclick="rvDelete(\''+r.id+'\')">삭제</button>'
+          +'</div>';
+      }).join('');
+   })
+   .catch(function(){ box.innerHTML='<div class="none">후기를 불러오지 못했습니다.</div>'; });
+}
+function rvToggle(id,val){
+  sbRpc('admin_set_review_approved',{pw:ADMIN_PASSWORD,review_id:id,val:val})
+   .then(function(r){ if(r.ok) rvAdminLoad(); else alert('변경에 실패했습니다.'); });
+}
+function rvDelete(id){
+  if(!confirm('이 후기를 완전히 삭제할까요?\n삭제하면 되돌릴 수 없습니다.')) return;
+  sbRpc('admin_delete_review',{pw:ADMIN_PASSWORD,review_id:id})
+   .then(function(r){ if(r.ok) rvAdminLoad(); else alert('삭제에 실패했습니다.'); });
+}
+
 function enter(){
   q('gate').style.display='none';
   q('admin').style.display='block';
+  rvAdminLoad();
   var SRC = (typeof MATERIALS !== 'undefined' && MATERIALS) ? MATERIALS : [];
   DATA = SRC.map(function(m){return {course:m.course||'',title:m.title||'',desc:m.desc||'',type:m.type||'PDF',url:m.url||'',date:m.date||'',hidden:!!m.hidden};});
   PW = (typeof CLASSROOM_PASSWORD !== 'undefined') ? CLASSROOM_PASSWORD : '';
