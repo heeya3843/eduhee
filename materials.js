@@ -107,6 +107,16 @@ const MATERIALS = [
   /* ── 바이브코딩으로 직접 만든 실습 도구 ── */
   {
     course: '🛠 직접 만든 AI 도구 (바이브코딩)',
+    title:  '깃허브 → 버셀(Vercel) 배포 가이드',
+    tag:    '필독',
+    desc:   'AI로 만든 웹페이지를 깃허브(GitHub)에 올리고 버셀(Vercel)로 실제 주소를 가진 사이트로 배포하는 방법을 단계별로 정리한 가이드. 클릭하면 브라우저에서 바로 열립니다.',
+    type:   '웹',
+    url:    'files/deploy_guide.html',
+    date:   '2026.08',
+  },
+
+  {
+    course: '🛠 직접 만든 AI 도구 (바이브코딩)',
     title:  '에듀희 영상편집기 (Claude 제작)',
     tag:    'Claude',
     desc:   'Claude로 만든 업그레이드 웹 영상편집기. 설치 없이 브라우저에서 바로 사용. 자막·BGM·전환효과·필터 지원. 클릭하면 새 창에서 열립니다. (Chrome/Edge 권장)',
