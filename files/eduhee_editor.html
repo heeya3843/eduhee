@@ -103,7 +103,7 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 .app {
   display: grid;
   grid-template-columns: 236px minmax(0, 1fr) 268px;
-  grid-template-rows: 46px minmax(0, 1fr) minmax(210px, 38vh);
+  grid-template-rows: minmax(46px, auto) minmax(0, 1fr) minmax(210px, 38vh);
   grid-template-areas:
     "bar   bar    bar"
     "media stage  props"
@@ -114,11 +114,13 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; colo
 }
 
 /* ── 상단 바 ────────────────────────────────────────────── */
+/* 버튼이 많아 창을 줄이면 한 줄에 다 안 들어간다.
+   숨어서 못 누르게 되는 대신, 아래 줄로 자연스럽게 넘어가게 한다. */
 .bar {
   grid-area: bar;
   background: var(--panel);
-  display: flex; align-items: center; gap: 10px;
-  padding: 0 12px;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px;
+  padding: 6px 12px;
 }
 .brand { display: flex; align-items: center; gap: 8px; margin-right: 4px; }
 .brand-dot {
@@ -395,17 +397,45 @@ input[type="range"] { flex: 1; accent-color: var(--rec); min-width: 0; }
 .clip[data-sel="1"] .clip-label { font-weight: 600; }
 .clip-label {
   font-size: 11px; white-space: nowrap; overflow: hidden;
-  text-overflow: ellipsis; pointer-events: none;
+  text-overflow: ellipsis; pointer-events: none; position: relative; z-index: 1;
+  text-shadow: 0 1px 3px rgba(0,0,0,.7);
 }
 .clip-dur {
-  margin-left: auto; padding-left: 8px; font-size: 10px; opacity: .7;
+  margin-left: auto; padding-left: 8px; font-size: 10px; opacity: .85;
   font-family: var(--font-mono); font-variant-numeric: tabular-nums; pointer-events: none;
+  position: relative; z-index: 1; text-shadow: 0 1px 3px rgba(0,0,0,.7); white-space: nowrap;
 }
 .clip.video { background: var(--tr-video-bg); border-color: var(--tr-video); color: var(--ink); }
+/* 영상 클립은 실제 장면(필름스트립)이 배경이라 테마 색 대신 항상 흰 글자로 읽히게 한다 */
+.clip.video .clip-label, .clip.video .clip-dur { color: #fff; }
 .clip.audio { background: var(--tr-audio-bg); border-color: var(--tr-audio); color: var(--ink); }
 .clip.text  { background: var(--tr-text-bg);  border-color: var(--tr-text);  color: var(--ink); }
 .clip.overlay { background: #33284a; border-color: #9b7fd4; color: var(--ink); }
 :root[data-theme="light"] .clip.overlay { background: #ece4f8; border-color: #7d5fc0; }
+
+/* 필름스트립·파형 — 클립을 색 막대가 아니라 실제 내용이 보이게 한다 */
+.clip-strip {
+  position: absolute; inset: 0; z-index: 0; display: flex;
+}
+.clip-strip img {
+  flex: 1 1 0; min-width: 0; height: 100%; object-fit: cover;
+  display: block; opacity: .8;
+}
+.clip-shade {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,0) 40%, rgba(0,0,0,0) 60%, rgba(0,0,0,.28));
+}
+.clip-wave { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; }
+.clip-wave polygon { fill: var(--tr-audio); opacity: .55; }
+/* 전환(디졸브)이 걸린 클립 오른쪽 끝에 표시 */
+.clip[data-trans="1"] {
+  border-image: linear-gradient(90deg, var(--tr-video) 0%, var(--tr-video) 70%, var(--ink) 100%) 1;
+}
+.clip-trans-badge {
+  position: absolute; right: 2px; bottom: 2px; z-index: 1;
+  font-size: 9px; line-height: 1; padding: 2px 4px; border-radius: 3px;
+  background: rgba(0,0,0,.55); color: #fff; pointer-events: none;
+}
 
 /* 트랙 색보다 선택 표시가 우선이어야 한다 (뒤에 오는 규칙이 이기므로 여기에 둔다) */
 .clip.clip[data-sel="1"] { border-color: var(--rec); }
@@ -479,7 +509,7 @@ kbd {
   .btn.sm { padding: 9px 11px; font-size: 12.5px; min-height: 38px; }
   .play-btn { width: 44px; height: 44px; }
   .brand-sub { display: none; }
-  .app { grid-template-rows: 46px minmax(150px, 26vh) minmax(200px, 30vh) auto auto; }
+  .app { grid-template-rows: minmax(46px, auto) minmax(150px, 26vh) minmax(200px, 30vh) auto auto; }
   .track { height: 44px; }
   .clip { padding: 0 8px; }
   .handle { width: 14px; }          /* 손가락으로 잡기 쉽게 */
@@ -493,7 +523,7 @@ kbd {
 
 /* 노트북처럼 세로가 짧은 화면에서도 트랙 세 줄이 다 보이게 */
 @media (max-height: 760px) {
-  .app { grid-template-rows: 42px minmax(0, 1fr) minmax(190px, 42vh); }
+  .app { grid-template-rows: minmax(42px, auto) minmax(0, 1fr) minmax(190px, 42vh); }
   .track { height: 38px; margin-top: 4px; }
   .stage-canvas-wrap { padding: 10px; }
 }
@@ -508,15 +538,18 @@ kbd {
 @media (max-width: 980px) {
   .app {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: 42px minmax(160px, 30vh) minmax(190px, 32vh) auto auto;
+    grid-template-rows: minmax(42px, auto) minmax(160px, 30vh) minmax(190px, 32vh) auto auto;
     grid-template-areas: "bar" "stage" "tl" "props" "media";
     height: auto; min-height: 100vh;
   }
   body { overflow: auto; }
-  .bar { overflow-x: auto; }
   .pane-body { max-height: 320px; }
 }
 </style>
+
+<!-- 기본은 밝은 화면으로 시작한다. 여기서 바로 정해야 어두운 화면이
+     잠깐이라도 번쩍이지 않는다 — 나머지 마크업이 그려지기 전에 실행된다. -->
+<script>document.documentElement.setAttribute('data-theme', 'light');</script>
 
 <div class="app">
 
@@ -529,27 +562,31 @@ kbd {
     </div>
     <span class="bar-sep"></span>
 
-    <button class="btn sm" id="btnNew">새로 시작</button>
-    <button class="btn sm" id="btnImport">파일 가져오기</button>
+    <button class="btn sm" id="btnNew">🆕 새로 시작</button>
+    <button class="btn sm" id="btnImport">📁 파일 가져오기</button>
+    <span class="bar-sep"></span>
     <button class="btn sm" id="btnUndo" disabled title="되돌리기 (Ctrl+Z)">↶ 되돌리기</button>
-    <button class="btn sm" id="btnRedo" disabled title="다시하기 (Ctrl+Shift+Z)">↷</button>
-    <button class="btn sm" id="btnSplit" disabled>자르기</button>
-    <button class="btn sm danger" id="btnDelete" disabled>삭제</button>
+    <button class="btn sm" id="btnRedo" disabled title="다시하기 (Ctrl+Shift+Z)">↷ 다시하기</button>
+    <button class="btn sm" id="btnSplit" disabled>✂️ 자르기</button>
+    <button class="btn sm danger" id="btnDelete" disabled>🗑 삭제</button>
     <span class="bar-sep"></span>
     <button class="btn sm" id="btnAutoSub" disabled>✨ 자동 자막</button>
-    <button class="btn sm" id="btnAddText">자막 추가</button>
+    <button class="btn sm" id="btnAddText">💬 자막 추가</button>
     <button class="btn sm" id="btnSticker">😀 스티커</button>
     <button class="btn sm" id="btnMosaic">🔲 모자이크</button>
+    <span class="bar-sep"></span>
     <button class="btn sm" id="btnRecord">🎙 목소리 녹음</button>
     <button class="btn sm" id="btnBgm">🎵 배경음악</button>
-    <button class="btn sm" id="btnImportSrt">SRT 불러오기</button>
-    <button class="btn sm" id="btnExportSrt">SRT 저장</button>
+    <span class="bar-sep"></span>
+    <button class="btn sm" id="btnImportSrt">📥 SRT 불러오기</button>
+    <button class="btn sm" id="btnExportSrt">📤 SRT 저장</button>
 
     <span class="bar-spacer"></span>
 
-    <button class="btn ghost sm" id="btnHelp">단축키</button>
-    <button class="btn ghost sm" id="btnTheme">밝게</button>
-    <button class="btn primary sm" id="btnExport" disabled>영상 내보내기</button>
+    <span class="pane-title" id="saveStatus" style="text-transform:none;letter-spacing:0;color:var(--ink-faint)"></span>
+    <button class="btn ghost sm" id="btnHelp">⌨️ 단축키</button>
+    <button class="btn ghost sm" id="btnTheme">🌙 어둡게</button>
+    <button class="btn primary sm" id="btnExport" disabled>⬇ 영상 내보내기</button>
   </header>
 
   <!-- ══ 미디어 보관함 ══ -->
@@ -706,19 +743,18 @@ function toast(msg, kind = '') {
 
 const mediaById = (id) => S.media.find(m => m.id === id);
 
-/* 배속 — 클립을 얼마나 빠르게/느리게 재생하는가.
-   원본 길이(outP-inP)를 배속으로 나눈 값이 타임라인에서 차지하는 실제 길이다.
-   예) 4초짜리를 2배속으로 하면 타임라인에선 2초만 쓴다. */
-function clipSpeed(c) { return (c && c.speed && c.speed > 0) ? c.speed : 1; }
-function srcLen(c) { return c.outP - c.inP; }                 // 원본에서 쓰는 길이
-function clipLen(c) { return srcLen(c) / clipSpeed(c); }      // 타임라인에서 차지하는 길이
+/* 배속을 적용한 실제 재생 길이. 원본은 (outP-inP)초지만
+   2배속이면 화면에서는 절반의 시간만 차지한다. */
+function clipLen(c) { return (c.outP - c.inP) / (c.rate || 1); }
+/* 타임라인 시각 t가 이 클립의 몇 초째(원본 기준)에 해당하는지 */
+function clipLocalTime(c, t) { return c.inP + (t - c.start) * (c.rate || 1); }
 
 function totalDuration() {
   let end = 0;
   for (const c of S.clips) end = Math.max(end, c.start + clipLen(c));
   for (const t of S.texts) end = Math.max(end, t.end);
   for (const o of S.overlays) end = Math.max(end, o.end);
-  for (const a of S.audio) end = Math.max(end, a.start + clipLen(a));
+  for (const a of S.audio) end = Math.max(end, a.start + (a.outP - a.inP));
   return end;
 }
 
@@ -777,7 +813,7 @@ function restoreSnapshot(snap) {
   S.audio = clone(snap.audio);
   S.aspect = snap.aspect; S.fit = snap.fit; S.cropY = snap.cropY;
   S.selected = snap.selected;
-  lastClipId = null;
+  lastClipByMedia.clear();
   for (const m of S.media) { try { if (m.el && m.el.pause) m.el.pause(); } catch (e) {} }
   applyAspect();
   renderMediaList();
@@ -811,6 +847,195 @@ function updateHistoryButtons() {
   const u = $('btnUndo'), r = $('btnRedo');
   if (u) { u.disabled = !HIST.past.length; u.title = `되돌리기 (Ctrl+Z) — ${HIST.past.length}단계`; }
   if (r) { r.disabled = !HIST.future.length; r.title = `다시하기 (Ctrl+Shift+Z)`; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   프로젝트 저장 — 새로고침하거나 브라우저가 죽어도 작업이 안 사라지게
+   파일 자체(블롭)는 한 번 넣을 때 딱 한 번만 저장하고,
+   자르기·자막 위치처럼 자주 바뀌는 가벼운 정보만 계속 다시 쓴다.
+   전부 이 컴퓨터 안에만 있고, 어디로도 전송되지 않는다.
+   ══════════════════════════════════════════════════════════ */
+const IDB_NAME = 'eduhee-editor', IDB_VER = 1;
+let idbPromise = null;
+
+function idb() {
+  if (idbPromise) return idbPromise;
+  idbPromise = new Promise((resolve, reject) => {
+    if (!window.indexedDB) { reject(new Error('IndexedDB 없음')); return; }
+    const req = indexedDB.open(IDB_NAME, IDB_VER);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains('media')) db.createObjectStore('media', { keyPath: 'id' });
+      if (!db.objectStoreNames.contains('project')) db.createObjectStore('project');
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+  return idbPromise;
+}
+function idbStore(store, mode) {
+  return idb().then(db => db.transaction(store, mode).objectStore(store));
+}
+function idbPut(store, key, val) {
+  return idbStore(store, 'readwrite').then(os => new Promise((resolve, reject) => {
+    const req = key === undefined ? os.put(val) : os.put(val, key);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  })).catch(() => {});   // 저장에 실패해도 편집 자체는 막지 않는다 — 조용히 넘어간다
+}
+function idbGet(store, key) {
+  return idbStore(store, 'readonly').then(os => new Promise((resolve, reject) => {
+    const req = os.get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  })).catch(() => undefined);
+}
+function idbGetAll(store) {
+  return idbStore(store, 'readonly').then(os => new Promise((resolve, reject) => {
+    const req = os.getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  })).catch(() => []);
+}
+function idbDelete(store, key) {
+  return idbStore(store, 'readwrite').then(os => new Promise((resolve) => {
+    os.delete(key).onsuccess = () => resolve();
+  })).catch(() => {});
+}
+function idbClear(store) {
+  return idbStore(store, 'readwrite').then(os => new Promise((resolve) => {
+    os.clear().onsuccess = () => resolve();
+  })).catch(() => {});
+}
+
+function serializeProject() {
+  return {
+    v: 1, savedAt: Date.now(),
+    mediaIds: S.media.map(m => m.id),
+    clips: S.clips, texts: S.texts, overlays: S.overlays, audio: S.audio,
+    aspect: S.aspect, fit: S.fit, cropY: S.cropY, masterVol: S.masterVol,
+  };
+}
+
+let autosaveTimer = null;
+function scheduleAutosave() {
+  if (S.exporting) return;
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(() => {
+    if (!S.media.length) { idbClear('project'); markSaved(false); return; }
+    idbPut('project', 'current', serializeProject()).then(() => markSaved(true));
+  }, 1200);
+}
+function saveMediaBlob(m) {
+  if (!m.file) return;
+  idbPut('media', undefined, { id: m.id, kind: m.kind, name: m.name, blob: m.file });
+}
+function markSaved(ok) {
+  const el = $('saveStatus');
+  if (!el) return;
+  el.textContent = ok ? '● 자동 저장됨' : '';
+  el.title = ok ? '이 컴퓨터·이 브라우저에 자동 저장됩니다. 새로고침해도 이어서 작업할 수 있습니다.' : '';
+}
+
+/* 시작할 때 저장된 작업이 있으면 이어서 할지 물어본다.
+   media 파일이 하나도 안 남아 있으면(예: 브라우저가 저장공간을 비웠다면)
+   조용히 건너뛴다 — 빈 프로젝트를 이어받아 봐야 혼란스러울 뿐이다. */
+function tryResumeProject() {
+  return idbGet('project', 'current').then(proj => {
+    const hasWork = proj && ((proj.clips && proj.clips.length) || (proj.texts && proj.texts.length) || (proj.audio && proj.audio.length));
+    if (!hasWork) return false;
+
+    const scrim = document.createElement('div');
+    scrim.className = 'scrim';
+    const when = proj.savedAt ? new Date(proj.savedAt).toLocaleString('ko-KR') : '';
+    scrim.innerHTML = `
+      <div class="card">
+        <h2>이어서 작업할까요?</h2>
+        <p>${when ? escapeHtml(when) + '에' : '이전에'} 저장해 둔 작업이 있습니다.
+           이 컴퓨터, 이 브라우저에만 저장되어 있었습니다.</p>
+        <div style="display:flex;justify-content:flex-end;gap:8px">
+          <button class="btn sm" id="btnResumeNo">새로 시작</button>
+          <button class="btn primary sm" id="btnResumeYes">이어서 작업</button>
+        </div>
+      </div>`;
+    document.body.appendChild(scrim);
+
+    return new Promise((resolve) => {
+      $('btnResumeNo').onclick = () => {
+        scrim.remove();
+        Promise.all([idbClear('project'), idbClear('media')]).then(() => resolve(false));
+      };
+      $('btnResumeYes').onclick = async () => {
+        scrim.remove();
+        toast('작업을 불러오는 중입니다…');
+        const ok = await loadProject(proj);
+        if (!ok) toast('불러오지 못했습니다. 새로 시작합니다.', 'bad');
+        resolve(ok);
+      };
+    });
+  });
+}
+
+/* 저장된 id(x12 같은)와 이번 세션의 새 id가 겹치지 않도록 카운터를 밀어 둔다 */
+function bumpUidFromIds(ids) {
+  for (const id of ids) {
+    const m = /^x(\d+)$/.exec(id || '');
+    if (m) uid = Math.max(uid, parseInt(m[1], 10));
+  }
+}
+
+async function loadProject(proj) {
+  try {
+    const rows = await idbGetAll('media');
+    const byId = new Map(rows.map(r => [r.id, r]));
+    const media = [];
+    for (const id of proj.mediaIds || []) {
+      const row = byId.get(id);
+      if (!row || !row.blob) continue;
+      const file = row.blob instanceof File ? row.blob : new File([row.blob], row.name || '파일', { type: row.blob.type });
+      let m;
+      try { m = await loadMedia(file, row.kind); } catch (e) { continue; }
+      m.id = id;   // clips·texts가 가리키는 id를 그대로 맞춰야 연결이 유지된다
+      media.push(m);
+      schedulePreviewAssets(m);
+    }
+    if (!media.length) return false;
+
+    S.media = media;
+    S.clips = proj.clips || [];
+    S.texts = proj.texts || [];
+    S.overlays = proj.overlays || [];
+    S.audio = proj.audio || [];
+    S.aspect = proj.aspect || '16:9';
+    S.fit = proj.fit || 'blur';
+    S.cropY = proj.cropY == null ? 0.5 : proj.cropY;
+    if (proj.masterVol != null) {
+      S.masterVol = proj.masterVol;
+      const mv = $('masterVol'); if (mv) mv.value = Math.round(S.masterVol * 100);
+      applyMasterVolume();
+    }
+    // 배속·전환·자막 애니메이션처럼 나중에 추가된 값은 옛 저장본에 없을 수 있다
+    for (const c of S.clips) { if (c.rate == null) c.rate = 1; if (c.transOut == null) c.transOut = 0; }
+    for (const t of S.texts) { if (!t.animIn) t.animIn = 'none'; if (!t.animOut) t.animOut = 'none'; }
+
+    bumpUidFromIds([
+      ...S.media.map(m => m.id), ...S.clips.map(c => c.id), ...S.texts.map(t => t.id),
+      ...S.overlays.map(o => o.id), ...S.audio.map(a => a.id),
+    ]);
+
+    applyAspect();
+    relayoutVideo();
+    renderMediaList();
+    syncAll();
+    HIST.past.length = 0; HIST.future.length = 0;
+    updateHistoryButtons();
+    HIST.lastSig = signature();
+    markSaved(true);
+    toast('이어서 작업합니다.', 'good');
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -925,6 +1150,8 @@ async function importFiles(files) {
       S.media.push(m);
       if (kind === 'video' || kind === 'image') addClip(m.id);
       else addAudio(m.id);
+      schedulePreviewAssets(m);
+      saveMediaBlob(m);
       added++;
     } catch (e) {
       toast(`"${f.name}" 을(를) 열 수 없습니다. 브라우저가 지원하지 않는 형식입니다.`, 'bad');
@@ -969,7 +1196,8 @@ function probeDuration(el) {
 function loadMedia(file, kind) {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
-    const base = { id: nextId(), kind, name: file.name, url };
+    // file 자체(블롭)를 들고 있어야 프로젝트를 저장했다가 나중에 다시 불러올 수 있다.
+    const base = { id: nextId(), kind, name: file.name, url, file };
 
     if (kind === 'image') {
       const img = new Image();
@@ -992,6 +1220,80 @@ function loadMedia(file, kind) {
     };
     el.onerror = reject;
   });
+}
+
+/* ══════════════════════════════════════════════════════════
+   타임라인 미리보기 — 필름스트립·파형
+   재생에 쓰는 요소(m.el)는 건드리지 않는다. 훑는 동안 재생 중인
+   영상이 끊기면 안 되므로 복제본을 새로 만들어 그 위에서만 작업한다.
+   ══════════════════════════════════════════════════════════ */
+const THUMB_COUNT = 10, THUMB_W = 96, THUMB_H = 54;
+
+function generateVideoThumbs(m) {
+  return new Promise((resolve) => {
+    const v = document.createElement('video');
+    v.src = m.url; v.muted = true; v.playsInline = true; v.preload = 'auto';
+    const n = Math.min(THUMB_COUNT, Math.max(2, Math.ceil(m.dur)));
+    const times = [];
+    for (let i = 0; i < n; i++) times.push((m.dur * i) / Math.max(1, n - 1));
+
+    const c = document.createElement('canvas');
+    c.width = THUMB_W; c.height = THUMB_H;
+    const cx = c.getContext('2d');
+    const thumbs = [];
+    let i = 0, done = false;
+    const finish = () => { if (!done) { done = true; resolve(thumbs); } };
+
+    const grabOne = () => {
+      if (i >= times.length) { finish(); return; }
+      const seekTo = clamp(times[i], 0, Math.max(0, m.dur - 0.05));
+      const onSeeked = () => {
+        v.removeEventListener('seeked', onSeeked);
+        try { cx.drawImage(v, 0, 0, THUMB_W, THUMB_H); thumbs.push(c.toDataURL('image/jpeg', 0.55)); }
+        catch (e) { /* 디코딩 실패한 프레임은 건너뛴다 */ }
+        i++; grabOne();
+      };
+      v.addEventListener('seeked', onSeeked);
+      try { v.currentTime = seekTo; } catch (e) { i++; grabOne(); }
+    };
+
+    v.onloadeddata = () => grabOne();
+    v.onerror = finish;
+    setTimeout(finish, 15000);   // 너무 오래 걸리면 그때까지 만든 것만 쓴다
+  });
+}
+
+async function generateAudioPeaks(m) {
+  try {
+    const buf = await (await fetch(m.url)).arrayBuffer();
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const decoded = await ac.decodeAudioData(buf);
+    ac.close();
+    const N = 300;
+    const data = decoded.getChannelData(0);
+    const peaks = new Array(N).fill(0);
+    const per = Math.max(1, Math.floor(data.length / N));
+    for (let i = 0; i < N; i++) {
+      let max = 0;
+      const start = i * per, end = Math.min(data.length, start + per);
+      for (let j = start; j < end; j += 4) { const a = Math.abs(data[j]); if (a > max) max = a; }
+      peaks[i] = max;
+    }
+    const norm = Math.max(...peaks, 0.001);
+    return peaks.map(v => Math.min(1, v / norm));
+  } catch (e) {
+    return [];
+  }
+}
+
+/* 새로 넣은 파일의 미리보기 그림을 만든다. 시간이 좀 걸려도 편집은 막지 않고,
+   다 되면 타임라인만 슬쩍 다시 그린다. */
+function schedulePreviewAssets(m) {
+  if (m.kind === 'video') {
+    generateVideoThumbs(m).then(thumbs => { m.thumbs = thumbs; renderTimeline(); });
+  } else if (m.kind === 'audio') {
+    generateAudioPeaks(m).then(peaks => { m.peaks = peaks; renderTimeline(); });
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1026,7 +1328,7 @@ function lookFilter(clip) {
 
 /* 페이드 — 0(까맣게)부터 1(완전히 보임)까지 */
 function fadeAlpha(clip, t) {
-  const len = clipLen(clip);          // 타임라인 기준 길이 (배속 반영)
+  const len = clipLen(clip);
   const into = t - clip.start;
   const fi = clip.fadeIn || 0, fo = clip.fadeOut || 0;
   let a = 1;
@@ -1041,6 +1343,7 @@ function addClip(mediaId) {
     id: nextId(), mediaId, start: 0, inP: 0, outP: m.dur, vol: 1,
     // 정지 사진은 가만히 두면 영상이 아니라 슬라이드다 — 기본으로 움직임을 준다
     motion: m.kind === 'image' ? 'zoomIn' : 'none',
+    rate: 1, transOut: 0,
   });
   relayoutVideo();
 }
@@ -1050,9 +1353,20 @@ function addAudio(mediaId) {
   // 35%로 두니 너무 작아 안 들린다는 얘기가 나왔다. 들리는 선에서 시작하고 줄이게 한다.
   S.audio.push({ id: nextId(), mediaId, start: 0, inP: 0, outP: m.dur, vol: 0.55 });
 }
+/* 클립을 순서대로 이어 붙인다. transOut(다음 클립과의 디졸브 길이)만큼은
+   다음 클립이 먼저 겹쳐 시작해야 두 화면이 함께 보이는 구간이 생긴다. */
 function relayoutVideo() {
   let t = 0;
-  for (const c of S.clips) { c.start = t; t += clipLen(c); }
+  for (let i = 0; i < S.clips.length; i++) {
+    const c = S.clips[i];
+    const prev = S.clips[i - 1];
+    if (prev) {
+      const trans = Math.min(prev.transOut || 0, clipLen(prev), clipLen(c));
+      t -= trans;
+    }
+    c.start = Math.max(0, t);
+    t = c.start + clipLen(c);
+  }
 }
 
 function splitAtPlayhead() {
@@ -1060,10 +1374,10 @@ function splitAtPlayhead() {
   const c = S.clips.find(c => t > c.start + 0.05 && t < c.start + clipLen(c) - 0.05);
   if (!c) { toast('재생헤드를 자를 클립 위에 놓아주세요.'); return; }
   pushHistory();
-  // 타임라인에서 흐른 시간을 배속만큼 되돌려 원본 위치를 구한다
-  const cut = c.inP + (t - c.start) * clipSpeed(c);
-  const right = { ...c, id: nextId(), inP: cut };
+  const cut = clipLocalTime(c, t);
+  const right = { ...c, id: nextId(), inP: cut, transOut: 0 };
   c.outP = cut;
+  c.transOut = 0;
   S.clips.splice(S.clips.indexOf(c) + 1, 0, right);
   relayoutVideo();
   S.selected = { type: 'clip', id: right.id };
@@ -1090,6 +1404,7 @@ function addText(content = '자막을 입력하세요', start = null, end = null
     start: s, end: end != null ? end : s + 3,
     size: 52, color: '#FFFFFF', yPct: 0.84, bg: true,
     font: 'gothic', weight: 700,
+    animIn: 'fade', animOut: 'fade',
   };
   S.texts.push(t);
   // 방금 만든 자막을 바로 고칠 수 있게 선택해 둔다
@@ -1742,8 +2057,15 @@ function askAutoSubtitle() {
 /* ══════════════════════════════════════════════════════════
    그리기
    ══════════════════════════════════════════════════════════ */
-function activeClip(t) {
-  return S.clips.find(c => t >= c.start && t < c.start + clipLen(c)) || null;
+/* 보통은 클립 하나만 활성이지만, 디졸브 전환 구간에서는
+   앞 클립과 뒤 클립이 잠깐 함께 활성 상태가 된다 (relayoutVideo가 겹쳐 배치한다). */
+function activeClips(t) {
+  const list = [];
+  for (const c of S.clips) {
+    const len = clipLen(c);
+    if (t >= c.start && t < c.start + len) list.push(c);
+  }
+  return list;
 }
 
 /* 원본을 꽉 채우는 크기 (넘치는 부분은 잘림) */
@@ -1896,64 +2218,80 @@ function drawSelectionUI(t) {
   ctx.restore();
 }
 
-/* 자막 등장·사라짐 애니메이션 */
-const TEXT_ANIMS = {
-  none:   '없음',
-  fade:   '스르륵 (페이드)',
-  pop:    '톡 튀어나오기',
-  slideU: '아래에서 올라오기',
-  slideD: '위에서 내려오기',
-  typing: '한 글자씩 (타이핑)',
+/* 자막 등장·퇴장 효과. none은 캡컷 이전 방식(그냥 나타났다 사라짐)과 같다. */
+const TEXT_ANIM_IN = {
+  none:       '없음',
+  fade:       '페이드인',
+  slideUp:    '아래에서 올라오기',
+  pop:        '통통 튀며 커지기',
+  typewriter: '타자기',
 };
-const TEXT_ANIM_DUR = 0.45;
-const smooth = (p) => p * p * (3 - 2 * p);
-const easeOutBack = (p) => { const c = 1.9; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+const TEXT_ANIM_OUT = {
+  none:       '없음',
+  fade:       '페이드아웃',
+  slideDown:  '아래로 내려가기',
+};
+const easeOutCubic = (x) => 1 - Math.pow(1 - x, 3);
 
 function drawTexts(t) {
   const W = canvas.width, H = canvas.height;
   const active = S.texts.filter(x => t >= x.start && t < x.end);
   for (const tx of active) {
-    const anim = tx.anim || 'none';
-    const span = tx.end - tx.start;
-    const d = Math.min(TEXT_ANIM_DUR, span / 2);
-    const into = t - tx.start, remain = tx.end - t;
-    const ei = d > 0 ? clamp(into / d, 0, 1) : 1;
-    const eo = d > 0 ? clamp(remain / d, 0, 1) : 1;
-    const se = smooth(ei);
+    const animIn = tx.animIn || 'none';
+    const animOut = tx.animOut || 'none';
+    const winLen = Math.max(0.05, tx.end - tx.start);
+    const dur = Math.max(0.05, Math.min(0.32, winLen / 2.2));
+    const intoStart = t - tx.start, intoEnd = tx.end - t;
+    const eIn = easeOutCubic(clamp(intoStart / dur, 0, 1));
+    const eOut = easeOutCubic(clamp(intoEnd / dur, 0, 1));
 
-    let alpha = 1, offY = 0, scale = 1;
-    let content = String(tx.content);
+    let alpha = 1, dy = 0, scale = 1;
+    let lines = String(tx.content).split('\n');
 
-    if (anim === 'fade') { alpha = se; }
-    else if (anim === 'pop') { alpha = se; scale = 0.5 + 0.5 * clamp(easeOutBack(ei), 0, 1.15); }
-    else if (anim === 'slideU') { alpha = se; offY = (1 - se) * tx.size * 1.1; }
-    else if (anim === 'slideD') { alpha = se; offY = -(1 - se) * tx.size * 1.1; }
-    else if (anim === 'typing') {
-      const chars = [...content];
-      const td = Math.min(span * 0.7, Math.max(0.5, chars.length * 0.06));
-      const n = Math.max(0, Math.floor(clamp(into / td, 0, 1) * chars.length));
-      content = chars.slice(0, n).join('');
+    if (animIn === 'typewriter') {
+      // 글자 수에 맞춰 속도를 맞춘다 — 짧은 자막은 빠르게, 긴 자막은 조금 더 여유 있게
+      const totalChars = lines.join('').length || 1;
+      const typeDur = clamp(totalChars * 0.045, 0.3, Math.max(0.3, winLen * 0.7));
+      const reveal = Math.floor(clamp(intoStart / typeDur, 0, 1) * totalChars);
+      if (reveal <= 0) continue;
+      let remain = reveal;
+      lines = lines.map(line => {
+        const take = Math.max(0, Math.min(line.length, remain));
+        remain -= line.length;
+        return line.slice(0, take);
+      });
+    } else if (animIn === 'fade') {
+      alpha = Math.min(alpha, eIn);
+    } else if (animIn === 'slideUp') {
+      dy += (1 - eIn) * tx.size * 0.9;
+      alpha = Math.min(alpha, eIn);
+    } else if (animIn === 'pop') {
+      scale *= (0.72 + 0.28 * eIn);
+      alpha = Math.min(alpha, eIn);
     }
-    // 없음을 뺀 모든 효과는 끝에서 자연스럽게 사라진다
-    if (anim !== 'none') alpha = Math.min(alpha, smooth(eo));
-    if (!content) continue;
-
-    const lines = content.split('\n');
-    const face = (FONTS[tx.font] || FONTS.gothic).css;
+    if (animOut === 'fade') {
+      alpha = Math.min(alpha, eOut);
+    } else if (animOut === 'slideDown') {
+      dy -= (1 - eOut) * tx.size * 0.9;
+      alpha = Math.min(alpha, eOut);
+    }
+    if (alpha <= 0.01) continue;
 
     ctx.save();
-    ctx.globalAlpha = clamp(alpha, 0, 1);
-    if (scale !== 1 || offY !== 0) {
-      const ax = W / 2, ay = tx.yPct * H;
-      ctx.translate(ax, ay + offY);
+    ctx.globalAlpha = alpha;
+    if (scale !== 1) {
+      const cx = W / 2, cy = H * tx.yPct;
+      ctx.translate(cx, cy);
       ctx.scale(scale, scale);
-      ctx.translate(-ax, -ay);
+      ctx.translate(-cx, -cy);
     }
+
+    const face = (FONTS[tx.font] || FONTS.gothic).css;
     ctx.font = `${tx.weight || 700} ${tx.size}px ${face}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     const lh = tx.size * 1.28;
-    let y = tx.yPct * H - ((lines.length - 1) * lh) / 2;
+    let y = tx.yPct * H - ((lines.length - 1) * lh) / 2 + dy;
     for (const line of lines) {
       if (tx.bg) {
         const w = ctx.measureText(line).width;
@@ -1995,6 +2333,10 @@ const MOTIONS = {
   panU:    '위로 흐르기',
 };
 
+/* 클립 재생 속도 프리셋. 소리 높낮이는 브라우저가 재생 속도에 맞춰
+   자동으로 바꾼다 — 별도 피치 보정은 하지 않는다(단순 편집기 수준). */
+const SPEEDS = [0.5, 1, 1.5, 2, 3];
+
 function drawWithMotion(m, clip, prog) {
   const motion = clip.motion || 'none';
   if (motion === 'none') { drawFrame(m.el, m.w, m.h); return; }
@@ -2020,171 +2362,91 @@ function drawWithMotion(m, clip, prog) {
   ctx.restore();
 }
 
-/* ── 전환효과 ─────────────────────────────────────────────
-   앞 클립의 마지막 화면을 사진처럼 찍어두고, 새 클립이 그 위로
-   디졸브·슬라이드·와이프하며 들어온다. 영상 두 개를 동시에 돌리지
-   않으므로 어떤 컴퓨터에서도 끊기지 않는다. 전환은 새 클립의
-   앞부분에서 일어난다. */
-const TRANSITIONS = {
-  none:     '없음',
-  dissolve: '디졸브 (서서히 바뀌기)',
-  slideL:   '왼쪽으로 밀기',
-  slideR:   '오른쪽으로 밀기',
-  slideU:   '위로 밀기',
-  wipeL:    '왼쪽에서 닦아내기',
-  circle:   '원형으로 열기',
-  zoom:     '확 다가오기',
-};
-const transSnap = document.createElement('canvas');
-let transSnapId = null;      // 스냅샷이 어느 클립 진입 때 찍혔는지
+let lastClipByMedia = new Map();   // mediaId → 그 미디어가 마지막으로 재생하던 clip.id
 
-function transProgress(clip, t) {
-  if (!clip || !clip.trans || clip.trans === 'none') return null;
-  if (S.clips.length && S.clips[0].id === clip.id) return null;  // 첫 클립엔 앞 화면이 없다
-  const d = clip.transDur || 0.5;
-  if (d <= 0) return null;
-  const into = t - clip.start;
-  if (into < 0 || into >= d) return null;
-  let p = into / d;
-  p = p * p * (3 - 2 * p);            // 시작·끝을 부드럽게
-  return { type: clip.trans, p };
-}
+/* 클립 하나를 그린다. mixAlpha는 디졸브 전환 중 겹쳐 그릴 때 쓰는 섞임 비율(0~1),
+   보통은 1이다. 배속(rate)이 걸려 있으면 원본 재생 위치를 그만큼 빠르게 계산한다. */
+function drawOneClip(clip, t, mixAlpha) {
+  const m = mediaById(clip.mediaId);
+  if (!m) return;
+  const rate = clip.rate || 1;
+  const localT = clipLocalTime(clip, t);
+  currentLook = lookFilter(clip);
+  const fade = fadeAlpha(clip, t);
+  const alpha = clamp(mixAlpha, 0, 1) * fade;
 
-/* 새 클립을 그리기 직전, 화면에 남아있는 앞 클립 프레임을 찍어둔다 */
-function captureTransSnap() {
-  if (transSnap.width !== canvas.width || transSnap.height !== canvas.height) {
-    transSnap.width = canvas.width; transSnap.height = canvas.height;
-  }
-  transSnap.getContext('2d').drawImage(canvas, 0, 0);
-}
-
-/* 스냅샷(앞 화면)을 배경으로 깔고, 새 클립이 들어올 상태를 만든다.
-   반환한 함수를 새 클립을 그린 뒤 호출해 마무리한다. */
-function beginTransition(tr) {
-  const W = canvas.width, H = canvas.height, p = tr.p;
-  ctx.drawImage(transSnap, 0, 0);
   ctx.save();
-  if (tr.type === 'dissolve') {
-    ctx.globalAlpha = p;
-  } else if (tr.type === 'slideL') {
-    ctx.translate((1 - p) * W, 0);
-  } else if (tr.type === 'slideR') {
-    ctx.translate(-(1 - p) * W, 0);
-  } else if (tr.type === 'slideU') {
-    ctx.translate(0, (1 - p) * H);
-  } else if (tr.type === 'wipeL') {
-    ctx.beginPath(); ctx.rect(0, 0, p * W, H); ctx.clip();
-  } else if (tr.type === 'circle') {
-    const r = p * Math.hypot(W, H) / 2;
-    ctx.beginPath(); ctx.arc(W / 2, H / 2, Math.max(0.1, r), 0, Math.PI * 2); ctx.clip();
-  } else if (tr.type === 'zoom') {
-    ctx.globalAlpha = p;
-    const s = 0.6 + 0.4 * p;
-    ctx.translate(W / 2, H / 2); ctx.scale(s, s); ctx.translate(-W / 2, -H / 2);
-  }
-  return () => ctx.restore();
-}
+  ctx.globalAlpha = alpha;
 
-let lastClipId = null;
+  if (m.kind === 'image') {
+    const len = clipLen(clip);
+    drawWithMotion(m, clip, len > 0 ? (t - clip.start) / len : 0);
+    if (S.playing) dirty = true;      // 움직이는 중이니 계속 다시 그린다
+  } else {
+    const v = m.el;
+    if (v.playbackRate !== rate) v.playbackRate = rate;
+    setGain(m, clip.vol * alpha);     // 화면이 흐려지거나 디졸브 중일 때 소리도 함께 섞인다
+    if (S.playing) {
+      if (v.paused || lastClipByMedia.get(clip.mediaId) !== clip.id) {
+        v.currentTime = localT;
+        v.play().catch(() => {});
+      } else if (Math.abs(v.currentTime - localT) > 0.3) {
+        v.currentTime = localT;
+      }
+    } else {
+      if (!v.paused) v.pause();
+      if (Math.abs(v.currentTime - localT) > 0.02) {
+        v.currentTime = localT;
+        // 탐색은 비동기라 프레임이 준비된 뒤에 한 번 더 그린다
+        v.addEventListener('seeked', requestRender, { once: true });
+      }
+    }
+    lastClipByMedia.set(clip.mediaId, clip.id);
+    if (v.readyState >= 2) drawFrame(v, m.w, m.h);
+  }
+  ctx.restore();
+  currentLook = '';
+  if (S.playing && fade < 1) dirty = true;
+}
 
 function render() {
   const t = S.playhead;
-  const clip = activeClip(t);
-
-  /* 전환: 새 클립에 막 들어섰고 전환이 걸려 있으면,
-     화면을 지우기 전에 앞 클립의 마지막 프레임을 찍어둔다. */
-  if ((S.playing || S.exporting) && clip && clip.id !== lastClipId
-      && clip.trans && clip.trans !== 'none') {
-    captureTransSnap();
-    transSnapId = clip.id;
-  }
-
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const actives = activeClips(t);
+  const usedMediaIds = new Set(actives.map(c => c.mediaId));
 
   // 쓰지 않는 영상은 세운다
   for (const m of S.media) {
     if (m.kind !== 'video') continue;
-    const used = clip && clip.mediaId === m.id;
-    if (!used && !m.el.paused) m.el.pause();
+    if (!usedMediaIds.has(m.id) && !m.el.paused) m.el.pause();
   }
 
-  if (clip) {
-    const m = mediaById(clip.mediaId);
-    const speed = clipSpeed(clip);
-    const localT = clip.inP + (t - clip.start) * speed;   // 배속만큼 원본을 빠르게 읽는다
-    currentLook = lookFilter(clip);
-    const fade = fadeAlpha(clip, t);
-
-    const len = clipLen(clip);
-    const prog = len > 0 ? (t - clip.start) / len : 0;
-    const useMotion = clip.motion && clip.motion !== 'none';
-
-    // 전환효과 (재생·내보내기 중이고 스냅샷이 이 클립 것일 때만)
-    const tr = (S.playing || S.exporting) && transSnapId === clip.id
-             ? transProgress(clip, t) : null;
-    const endTrans = tr ? beginTransition(tr) : null;
-    if (tr && S.playing) dirty = true;
-
-    if (m.kind === 'image') {
-      drawWithMotion(m, clip, prog);
-      if (S.playing) dirty = true;      // 움직이는 중이니 계속 다시 그린다
-    } else {
-      const v = m.el;
-      try { v.playbackRate = speed; } catch (e) {}
-      setGain(m, clip.vol * fade);   // 화면이 어두워질 때 소리도 함께 잦아든다
-      if (S.playing) {
-        if (v.paused || lastClipId !== clip.id) {
-          v.currentTime = localT;
-          v.play().catch(() => {});
-        } else if (Math.abs(v.currentTime - localT) > 0.3 * Math.max(1, speed)) {
-          v.currentTime = localT;
-        }
-      } else {
-        if (!v.paused) v.pause();
-        if (Math.abs(v.currentTime - localT) > 0.02) {
-          v.currentTime = localT;
-          // 탐색은 비동기라 프레임이 준비된 뒤에 한 번 더 그린다
-          v.addEventListener('seeked', requestRender, { once: true });
-        }
-      }
-      if (v.readyState >= 2) {
-        if (useMotion) { drawWithMotion(m, clip, prog); if (S.playing) dirty = true; }
-        else drawFrame(v, m.w, m.h);
-      }
-    }
-
-    if (endTrans) endTrans();
-
-    // 페이드 — 검은 막을 덮어 서서히 나타나고 사라지게 한다
-    if (fade < 1) {
-      ctx.save();
-      ctx.globalAlpha = 1 - fade;
-      ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.restore();
-      if (S.playing) dirty = true;
-    }
-    currentLook = '';
-    lastClipId = clip.id;
+  if (actives.length >= 2) {
+    // 디졸브 구간 — 먼저 시작한 클립을 바탕에, 다음 클립을 알파로 겹쳐 그린다
+    const [A, B] = actives[0].start <= actives[1].start ? actives : [actives[1], actives[0]];
+    const overlapLen = Math.max(0.01, (A.start + clipLen(A)) - B.start);
+    const p = clamp((t - B.start) / overlapLen, 0, 1);
+    drawOneClip(A, t, 1);
+    drawOneClip(B, t, p);
+  } else if (actives.length === 1) {
+    drawOneClip(actives[0], t, 1);
   } else {
     currentLook = '';
-    lastClipId = null;
   }
 
   // 음악 트랙
   for (const a of S.audio) {
     const m = mediaById(a.mediaId);
     if (!m) continue;
-    const sp = clipSpeed(a);
-    const len = clipLen(a);
+    const len = a.outP - a.inP;
     const inside = t >= a.start && t < a.start + len;
-    const localT = a.inP + (t - a.start) * sp;
+    const localT = a.inP + (t - a.start);
     setGain(m, a.vol);
     if (inside && S.playing) {
-      try { m.el.playbackRate = sp; } catch (e) {}
       if (m.el.paused) { m.el.currentTime = localT; m.el.play().catch(() => {}); }
-      else if (Math.abs(m.el.currentTime - localT) > 0.3 * Math.max(1, sp)) m.el.currentTime = localT;
+      else if (Math.abs(m.el.currentTime - localT) > 0.3) m.el.currentTime = localT;
     } else if (!m.el.paused) {
       m.el.pause();
     }
@@ -2268,14 +2530,8 @@ function seek(t) {
 let recorder = null, chunks = [], exportStart = 0, exportTotal = 0, watchdog = null;
 
 function pickMime() {
-  /* MP4(H.264)를 최우선으로 고른다 — 카카오톡·윈도우 기본 재생기·유튜브·
-     인스타 어디서나 바로 열린다. 요즘 크롬·엣지는 MP4 녹화를 지원한다.
-     지원하지 않는 낡은 브라우저에서만 webm으로 떨어진다. */
   const list = [
-    'video/mp4;codecs=avc1.640028,mp4a.40.2',   // H.264 High + AAC
-    'video/mp4;codecs=avc1.42E01E,mp4a.40.2',   // H.264 Baseline + AAC
-    'video/mp4;codecs=avc1.4d0028,mp4a.40.2',   // H.264 Main + AAC
-    'video/mp4',
+    'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
     'video/webm;codecs=vp9,opus',
     'video/webm;codecs=vp8,opus',
     'video/webm',
@@ -2297,34 +2553,21 @@ async function startExport() {
   const mime = pickMime();
   if (!mime) { toast('이 브라우저는 영상 녹화를 지원하지 않습니다. 크롬이나 엣지로 열어주세요.', 'bad'); return; }
 
-  const isMp4 = mime.startsWith('video/mp4');
-  if (!isMp4) {
-    // MP4가 안 되는 낡은 브라우저 — webm으로 저장하되 분명히 알려준다
-    toast('이 브라우저는 MP4 저장을 지원하지 않아 webm으로 저장됩니다. 크롬·엣지 최신판을 권합니다.', 'bad');
-  }
-
-  const fps = 30;
-  const vTrack = canvas.captureStream(fps).getVideoTracks();
+  const vTrack = canvas.captureStream(30).getVideoTracks();
   const aTrack = recDest ? recDest.stream.getAudioTracks() : [];
   const stream = new MediaStream([...vTrack, ...aTrack]);
 
-  /* 화질 — 해상도에 맞춰 넉넉히. 1080p는 약 10Mbps, 세로 영상도 동일. */
-  const px = canvas.width * canvas.height;
-  const bitrate = Math.min(24_000_000, Math.max(8_000_000, Math.round(px * 5)));
-
   chunks = [];
-  const mkRecorder = (opts) => new MediaRecorder(stream, opts);
   try {
-    recorder = mkRecorder({ mimeType: mime, videoBitsPerSecond: bitrate, audioBitsPerSecond: 192_000 });
+    recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 8_000_000 });
   } catch (e) {
-    try { recorder = mkRecorder({ mimeType: mime }); }   // 옵션 없이 한 번 더
-    catch (e2) { toast('녹화를 시작할 수 없습니다. 크롬이나 엣지로 열어주세요.', 'bad'); return; }
+    toast('녹화를 시작할 수 없습니다. 크롬이나 엣지로 열어주세요.', 'bad');
+    return;
   }
   recorder.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
   recorder.onstop = () => {
     const blob = new Blob(chunks, { type: mime.split(';')[0] });
-    const ext = isMp4 ? 'mp4' : 'webm';
-    if (!blob.size) { closeScrim(); toast('녹화된 내용이 없습니다. 다시 시도해주세요.', 'bad'); return; }
+    const ext = mime.startsWith('video/mp4') ? 'mp4' : 'webm';
     download(blob, `내영상.${ext}`);
     closeScrim();
     toast(`내영상.${ext} 저장 완료 — ${(blob.size / 1048576).toFixed(1)}MB`, 'good');
@@ -2487,7 +2730,7 @@ function removeMedia(mediaId) {
 
   S.media = S.media.filter(x => x.id !== mediaId);
   relayoutVideo();
-  lastClipId = null;
+  lastClipByMedia.clear();
   renderMediaList();
   syncAll();
   toast(`"${m.name}" 을(를) 지웠습니다.`);
@@ -2526,31 +2769,89 @@ function renderTimeline() {
   updatePlayhead();
 }
 
+/* 클립 안에 실제 장면이 보이게 — 영상은 필름스트립, 사진은 그 사진 자체 */
+function clipVisualHtml(it, widthPx) {
+  const m = mediaById(it.mediaId);
+  if (!m) return '';
+  if (m.kind === 'image') {
+    return `<div class="clip-strip"><img src="${m.url}" draggable="false" alt=""></div><div class="clip-shade"></div>`;
+  }
+  if (m.kind === 'video' && m.thumbs && m.thumbs.length) {
+    const tileW = 42;
+    const tiles = Math.max(1, Math.min(m.thumbs.length, Math.round(widthPx / tileW)));
+    const dur = m.dur || 1;
+    let html = '<div class="clip-strip">';
+    for (let i = 0; i < tiles; i++) {
+      const frac = tiles > 1 ? i / (tiles - 1) : 0;
+      const localTime = it.inP + frac * (it.outP - it.inP);
+      const idx = clamp(Math.round((localTime / dur) * (m.thumbs.length - 1)), 0, m.thumbs.length - 1);
+      html += `<img src="${m.thumbs[idx]}" draggable="false" alt="">`;
+    }
+    html += '</div><div class="clip-shade"></div>';
+    return html;
+  }
+  return '';
+}
+
+/* 오디오 파형 — 미리 뽑아둔 봉우리(peaks)에서 이 클립이 쓰는 구간만 잘라 그린다 */
+function waveformPoints(peaks, i0, i1, w, h) {
+  const n = Math.max(1, i1 - i0);
+  const mid = h / 2;
+  const step = 8;
+  const top = [], bot = [];
+  for (let x = 0; x <= w; x += step) {
+    const idx = i0 + Math.min(n - 1, Math.floor((x / w) * n));
+    const v = clamp(peaks[idx] || 0, 0, 1);
+    top.push(`${x},${(mid - v * mid * 0.9).toFixed(1)}`);
+    bot.push(`${x},${(mid + v * mid * 0.9).toFixed(1)}`);
+  }
+  return top.join(' ') + ' ' + bot.reverse().join(' ');
+}
+function audioWaveHtml(it) {
+  const m = mediaById(it.mediaId);
+  if (!m || !m.peaks || !m.peaks.length) return '';
+  const dur = m.dur || 1;
+  const i0 = clamp(Math.floor((it.inP / dur) * m.peaks.length), 0, m.peaks.length - 1);
+  const i1 = clamp(Math.ceil((it.outP / dur) * m.peaks.length), i0 + 1, m.peaks.length);
+  const W = 400, H = 40;
+  const pts = waveformPoints(m.peaks, i0, i1, W, H);
+  return `<svg class="clip-wave" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polygon points="${pts}"></polygon></svg>`;
+}
+
 function drawTrack(trackId, items, type, cls) {
   const track = $(trackId);
   track.querySelectorAll('.clip').forEach(n => n.remove());
   for (const it of items) {
     const start = it.start;
-    const len = (type === 'text' || type === 'overlay')
-      ? (it.end - it.start) : clipLen(it);
+    const len = type === 'clip' ? clipLen(it)
+      : (type === 'text' || type === 'overlay') ? (it.end - it.start)
+      : (it.outP - it.inP);
     if (len <= 0) continue;
+    const widthPx = Math.max(18, len * S.pxPerSec);
     const el = document.createElement('div');
     el.className = `clip ${cls}`;
     el.dataset.id = it.id;
     el.dataset.type = type;
     el.dataset.sel = (S.selected && S.selected.id === it.id) ? '1' : '0';
+    if (type === 'clip') el.dataset.trans = (it.transOut > 0) ? '1' : '0';
     el.style.left = (start * S.pxPerSec) + 'px';
-    el.style.width = Math.max(18, len * S.pxPerSec) + 'px';
+    el.style.width = widthPx + 'px';
     const label = type === 'text' ? it.content.split('\n')[0]
       : type === 'overlay'
         ? (it.kind === 'mosaic'
             ? (it.style === 'blur' ? '흐리게 가리기' : '모자이크')
             : it.emoji + ' 스티커')
       : (mediaById(it.mediaId) || {}).name || '';
-    el.innerHTML =
+    const visual = type === 'clip' ? clipVisualHtml(it, widthPx)
+      : type === 'audio' ? audioWaveHtml(it) : '';
+    const rateBadge = (type === 'clip' && it.rate && it.rate !== 1) ? ` · ${it.rate}x` : '';
+    const transBadge = (type === 'clip' && it.transOut > 0)
+      ? `<span class="clip-trans-badge" title="다음 클립과 ${it.transOut.toFixed(1)}초 디졸브">⇄ ${it.transOut.toFixed(1)}s</span>` : '';
+    el.innerHTML = visual +
       `<div class="handle l"></div>` +
       `<span class="clip-label">${escapeHtml(label)}</span>` +
-      `<span class="clip-dur">${len.toFixed(1)}s</span>` +
+      `<span class="clip-dur">${len.toFixed(1)}s${rateBadge}</span>` +
+      transBadge +
       `<button class="clip-x" title="이 클립 지우기">×</button>` +
       `<div class="handle r"></div>`;
     el.querySelector('.clip-x').addEventListener('pointerdown', (e) => {
@@ -2752,14 +3053,6 @@ function renderProps() {
         </div>
       </div>
       <div class="field">
-        <label class="label" for="txAnim">등장 효과 <span style="color:var(--rec)">NEW</span></label>
-        <select class="input" id="txAnim">
-          ${Object.entries(TEXT_ANIMS).map(([k, v]) =>
-            `<option value="${k}"${(item.anim || 'none') === k ? ' selected' : ''}>${v}</option>`).join('')}
-        </select>
-        <div class="hint">자막이 톡 튀어나오거나 한 글자씩 나타납니다. 끝에서는 스르륵 사라집니다.</div>
-      </div>
-      <div class="field">
         <span class="label">글자 크기</span>
         <div class="row">
           <input type="range" id="txSize" min="20" max="160" step="2" value="${item.size}">
@@ -2788,6 +3081,20 @@ function renderProps() {
         </div>
       </div>
       <div class="field">
+        <label class="label" for="txAnimIn">등장 효과</label>
+        <select class="input" id="txAnimIn">
+          ${Object.entries(TEXT_ANIM_IN).map(([k, v]) =>
+            `<option value="${k}"${(item.animIn || 'none') === k ? ' selected' : ''}>${v}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label class="label" for="txAnimOut">퇴장 효과</label>
+        <select class="input" id="txAnimOut">
+          ${Object.entries(TEXT_ANIM_OUT).map(([k, v]) =>
+            `<option value="${k}"${(item.animOut || 'none') === k ? ' selected' : ''}>${v}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
         <span class="label">표시 구간</span>
         <div class="row">
           <input class="input" type="number" id="txStart" step="0.1" min="0" value="${item.start.toFixed(1)}">
@@ -2804,11 +3111,11 @@ function renderProps() {
       </div>` : ''}` + aspectSeg;
   } else {
     const m = mediaById(item.mediaId) || {};
-    const len = item.outP - item.inP;
+    const srcLen = item.outP - item.inP;
+    const len = clipLen(item);
     const isImg = m.kind === 'image';
-    const isAudio = m.kind === 'audio';
-    const spd = clipSpeed(item);
-    const tlLen = clipLen(item);
+    const cIdx = S.clips.indexOf(item);
+    const hasNext = cIdx >= 0 && cIdx < S.clips.length - 1;
 
     const imgControls = `
       <div class="field">
@@ -2826,21 +3133,6 @@ function renderProps() {
             `<option value="${k}"${(item.motion || 'none') === k ? ' selected' : ''}>${v}</option>`).join('')}
         </select>
         <div class="hint">가만히 있는 사진에 움직임을 줘서 영상처럼 보이게 합니다.</div>
-      </div>`;
-
-    /* 배속 — 영상·소리 클립에 붙는다 (사진은 '영상 길이'로 조절) */
-    const speedControl = `
-      <div class="field">
-        <span class="label">배속 <span style="color:var(--rec)">NEW</span></span>
-        <div class="seg" id="segSpeed">
-          ${[0.5, 1, 1.5, 2].map(s =>
-            `<button data-s="${s}" aria-pressed="${Math.abs(spd - s) < 0.001}">${s}x</button>`).join('')}
-        </div>
-        <div class="row" style="margin-top:6px">
-          <input type="range" id="clSpeed" min="0.25" max="4" step="0.05" value="${spd}">
-          <span class="num">${spd.toFixed(2)}x</span>
-        </div>
-        <div class="hint">타임라인 길이 ${tlLen.toFixed(1)}초 · 슬로우(0.25x)~빠르게(4x). 소리 높낮이도 함께 변합니다.</div>
       </div>`;
 
     const videoControls = `
@@ -2864,37 +3156,24 @@ function renderProps() {
           <input type="range" id="clOut" min="0" max="${(m.dur || 1).toFixed(2)}" step="0.05" value="${item.outP}">
           <span class="num">${item.outP.toFixed(1)}s</span>
         </div>
-      </div>`;
-
-    /* 화면 움직임(줌 강조) — 영상 클립에도 적용 */
-    const motionControl = `
+      </div>
       <div class="field">
-        <label class="label" for="clMotion">화면 움직임 · 줌 강조 <span style="color:var(--rec)">NEW</span></label>
-        <select class="input" id="clMotion">
-          ${Object.entries(MOTIONS).map(([k, v]) =>
-            `<option value="${k}"${(item.motion || 'none') === k ? ' selected' : ''}>${v}</option>`).join('')}
-        </select>
-        <div class="hint">중요한 순간에 화면을 천천히 확대해 시선을 모읍니다.</div>
-      </div>`;
-
-    /* 전환효과 — 앞 장면에서 이 클립으로 넘어올 때 (영상·사진 클립만) */
-    const isFirst = S.clips.length && S.clips[0].id === item.id;
-    const transControl = (S.selected.type === 'clip') ? `
+        <span class="label">재생 속도</span>
+        <div class="seg" id="segSpeed">
+          ${SPEEDS.map(s =>
+            `<button data-r="${s}" aria-pressed="${(item.rate || 1) === s}">${s}x</button>`).join('')}
+        </div>
+        <div class="hint">${len.toFixed(1)}초로 재생됩니다 (원본 ${srcLen.toFixed(1)}초).${(item.rate||1)!==1 ? ' 소리 높낮이도 함께 바뀝니다.' : ''}</div>
+      </div>
+      ${hasNext ? `
       <div class="field">
-        <label class="label" for="clTrans">전환효과 · 앞 장면에서 넘어올 때 <span style="color:var(--rec)">NEW</span></label>
-        <select class="input" id="clTrans">
-          ${Object.entries(TRANSITIONS).map(([k, v]) =>
-            `<option value="${k}"${(item.trans || 'none') === k ? ' selected' : ''}>${v}</option>`).join('')}
-        </select>
-        ${(item.trans && item.trans !== 'none') ? `
-        <div class="row" style="margin-top:6px">
-          <span class="label" style="margin:0">길이</span>
-          <input type="range" id="clTransDur" min="0.2" max="1.5" step="0.1" value="${item.transDur || 0.5}">
-          <span class="num">${(item.transDur || 0.5).toFixed(1)}s</span>
-        </div>` : ''}
-        ${isFirst ? `<div class="hint">맨 앞 클립에는 전환이 없습니다. 두 번째 클립부터 골라주세요.</div>` : ''}
-        ${S.clips.length > 1 ? `<button class="btn sm" id="btnTransAll" style="width:100%;justify-content:center;margin-top:8px">모든 클립에 이 전환 적용</button>` : ''}
-      </div>` : '';
+        <span class="label">다음 클립과 전환 (디졸브)</span>
+        <div class="row">
+          <input type="range" id="clTrans" min="0" max="2" step="0.1" value="${item.transOut || 0}">
+          <span class="num">${(item.transOut || 0).toFixed(1)}s</span>
+        </div>
+        <div class="hint">겹치는 시간만큼 두 장면이 자연스럽게 섞이며 넘어갑니다.</div>
+      </div>` : ''}`;
 
     const lookControls = `
       <div class="field">
@@ -2936,28 +3215,18 @@ function renderProps() {
       ${S.clips.length > 1 ? `
       <div class="field">
         <button class="btn" id="btnAutoTrans" style="width:100%;justify-content:center">
-          클립 ${S.clips.length}개 사이에 전환 넣기
+          클립 ${S.clips.length}개 사이에 디졸브 전환 넣기
         </button>
-        <div class="hint">이어지는 장면들이 자연스럽게 넘어갑니다.</div>
+        <div class="hint">이어지는 장면들이 자연스럽게 섞이며 넘어갑니다.</div>
       </div>` : ''}`;
 
-    const header = `
+    box.innerHTML = `
       <div class="field">
-        <span class="label">${isImg ? '사진' : isAudio ? '소리 클립' : '영상 클립'}</span>
+        <span class="label">${isImg ? '사진' : '영상 클립'}</span>
         <div style="font-size:12px;word-break:break-all">${escapeHtml(m.name || '')}</div>
-        <div class="mspec" style="margin-top:3px">타임라인 길이 ${tlLen.toFixed(2)}초</div>
-      </div>`;
-
-    if (isImg) {
-      // 사진: 길이·모션 → 전환 → 색감
-      box.innerHTML = header + imgControls + transControl + lookControls + aspectSeg;
-    } else if (isAudio) {
-      // 소리: 배속·볼륨·다듬기만 (색감·전환은 의미 없음)
-      box.innerHTML = header + speedControl + videoControls + aspectSeg;
-    } else {
-      // 영상: 배속 → 볼륨·다듬기 → 줌 강조 → 전환 → 색감
-      box.innerHTML = header + speedControl + videoControls + motionControl + transControl + lookControls + aspectSeg;
-    }
+        <div class="mspec" style="margin-top:3px">길이 ${len.toFixed(2)}초</div>
+      </div>
+      ${isImg ? imgControls : videoControls}` + lookControls + aspectSeg;
   }
 
   bindProps(item);
@@ -3045,7 +3314,8 @@ function bindProps(item) {
       requestRender();
     };
     on('txFont', 'change', (e) => { item.font = e.target.value; requestRender(); });
-    on('txAnim', 'change', (e) => { item.anim = e.target.value; requestRender(); });
+    on('txAnimIn', 'change', (e) => { item.animIn = e.target.value; requestRender(); });
+    on('txAnimOut', 'change', (e) => { item.animOut = e.target.value; requestRender(); });
     const wSeg = $('segWeight');
     if (wSeg) wSeg.onclick = (e) => {
       const b = e.target.closest('button'); if (!b) return;
@@ -3058,7 +3328,7 @@ function bindProps(item) {
         if (t === item) continue;
         t.font = item.font; t.weight = item.weight; t.size = item.size;
         t.color = item.color; t.yPct = item.yPct; t.bg = item.bg;
-        t.anim = item.anim;
+        t.animIn = item.animIn; t.animOut = item.animOut;
       }
       requestRender();
       toast(`자막 ${S.texts.length}개의 모양을 통일했습니다.`, 'good');
@@ -3072,42 +3342,6 @@ function bindProps(item) {
       relayoutVideo(); renderTimeline(); updateTimecode(); requestRender();
     });
     on('imgMotion', 'change', (e) => { item.motion = e.target.value; requestRender(); });
-
-    // 배속
-    on('clSpeed', 'input', (e) => {
-      item.speed = clamp(+e.target.value, 0.25, 4);
-      e.target.nextElementSibling.textContent = item.speed.toFixed(2) + 'x';
-      if (S.selected.type === 'clip') relayoutVideo();
-      renderTimeline(); updateTimecode(); requestRender();
-    });
-    const segSpeed = $('segSpeed');
-    if (segSpeed) segSpeed.onclick = (e) => {
-      const b = e.target.closest('button'); if (!b) return;
-      item.speed = +b.dataset.s;
-      if (S.selected.type === 'clip') relayoutVideo();
-      renderProps(); renderTimeline(); updateTimecode(); requestRender();
-    };
-    // 화면 움직임(줌 강조) — 영상 클립
-    on('clMotion', 'change', (e) => { item.motion = e.target.value; requestRender(); });
-    // 전환효과
-    on('clTrans', 'change', (e) => {
-      item.trans = e.target.value;
-      if (item.trans !== 'none' && !item.transDur) item.transDur = 0.5;
-      renderProps(); renderTimeline(); requestRender();
-    });
-    on('clTransDur', 'input', (e) => {
-      item.transDur = +e.target.value;
-      e.target.nextElementSibling.textContent = item.transDur.toFixed(1) + 's';
-      requestRender();
-    });
-    on('btnTransAll', 'click', () => {
-      const ty = item.trans || 'none', du = item.transDur || 0.5;
-      S.clips.forEach((c, i) => { if (i === 0) return; c.trans = ty; c.transDur = du; });
-      renderProps(); renderTimeline(); requestRender();
-      toast(ty === 'none' ? '모든 전환을 없앴습니다.'
-                          : `모든 클립에 '${TRANSITIONS[ty]}' 전환을 넣었습니다.`, 'good');
-    });
-
     on('clLook', 'change', (e) => { item.look = e.target.value; requestRender(); });
     on('clBright', 'input', (e) => {
       item.bright = +e.target.value;
@@ -3130,15 +3364,30 @@ function bindProps(item) {
       requestRender();
     });
     on('btnAutoTrans', 'click', () => {
-      // 클립마다 앞뒤로 짧은 페이드를 넣으면 장면이 부드럽게 이어진다
+      // 마지막 클립을 뺀 모두에게 짧은 디졸브를 걸어 자연스럽게 이어지게 한다
       S.clips.forEach((c, i) => {
-        const len = c.outP - c.inP;
-        const d = Math.min(0.5, len / 4);
-        c.fadeIn = i === 0 ? (c.fadeIn || 0) : d;
-        c.fadeOut = i === S.clips.length - 1 ? (c.fadeOut || 0) : d;
+        if (i === S.clips.length - 1) return;
+        const next = S.clips[i + 1];
+        c.transOut = Math.min(0.6, clipLen(c) / 4, clipLen(next) / 4);
       });
+      relayoutVideo();
       syncAll();
-      toast(`클립 ${S.clips.length}개 사이에 전환을 넣었습니다.`, 'good');
+      toast(`클립 ${S.clips.length}개 사이에 디졸브 전환을 넣었습니다.`, 'good');
+    });
+    const segSpeed = $('segSpeed');
+    if (segSpeed) segSpeed.onclick = (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      item.rate = +b.dataset.r;
+      relayoutVideo();
+      syncAll();
+    };
+    on('clTrans', 'input', (e) => {
+      item.transOut = +e.target.value;
+      e.target.nextElementSibling.textContent = item.transOut.toFixed(1) + 's';
+      relayoutVideo();
+      renderTimeline();
+      updateTimecode();
+      requestRender();
     });
     on('clVol', 'input', (e) => { item.vol = +e.target.value; e.target.nextElementSibling.textContent = Math.round(item.vol * 100) + '%'; });
     on('clIn', 'input', (e) => {
@@ -3159,7 +3408,7 @@ function bindProps(item) {
 function applyAspect() {
   const [w, h] = ASPECTS[S.aspect];
   canvas.width = w; canvas.height = h;
-  lastClipId = null;
+  lastClipByMedia.clear();
   fitPreview();
   requestRender();
 }
@@ -3222,6 +3471,7 @@ function syncAll() {
   $('btnSplit').disabled = !S.clips.length;
   $('btnDelete').disabled = !S.selected;
   $('btnAutoSub').disabled = !subtitleTargets().length;
+  scheduleAutosave();
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -3286,18 +3536,21 @@ $('tlInner').addEventListener('pointermove', (e) => {
     else { item.end = Math.max(item.start + 0.3, drag.tEnd0 + dt); }
   } else {
     const m = mediaById(item.mediaId) || { dur: 1 };
-    if (mode === 'trimL') item.inP = clamp(drag.in0 + dt, 0, item.outP - 0.2);
-    else if (mode === 'trimR') item.outP = clamp(drag.out0 + dt, item.inP + 0.2, maxOutOf(m));
+    // 배속이 걸려 있으면 화면(타임라인)의 1초가 원본으로는 rate초만큼 지나간다
+    const rate = type === 'clip' ? (item.rate || 1) : 1;
+    const srcDt = dt * rate;
+    if (mode === 'trimL') item.inP = clamp(drag.in0 + srcDt, 0, item.outP - 0.2);
+    else if (mode === 'trimR') item.outP = clamp(drag.out0 + srcDt, item.inP + 0.2, maxOutOf(m));
     else if (type === 'audio') item.start = Math.max(0, drag.start0 + dt);
     else {
       // 영상 클립 이동 = 순서 바꾸기
       const i = S.clips.indexOf(item);
       const target = drag.start0 + dt;
-      if (dt < 0 && i > 0 && target < S.clips[i - 1].start + (S.clips[i - 1].outP - S.clips[i - 1].inP) / 2) {
+      if (dt < 0 && i > 0 && target < S.clips[i - 1].start + clipLen(S.clips[i - 1]) / 2) {
         S.clips.splice(i, 1); S.clips.splice(i - 1, 0, item); drag.x0 = e.clientX; drag.start0 = item.start;
       } else if (dt > 0 && i < S.clips.length - 1) {
         const nx = S.clips[i + 1];
-        if (target + (item.outP - item.inP) > nx.start + (nx.outP - nx.inP) / 2) {
+        if (target + clipLen(item) > nx.start + clipLen(nx) / 2) {
           S.clips.splice(i, 1); S.clips.splice(i + 1, 0, item); drag.x0 = e.clientX; drag.start0 = item.start;
         }
       }
@@ -3448,7 +3701,7 @@ canvas.addEventListener('pointercancel', endPreviewDrag);
 /* 처음 상태로 되돌린다. 새로고침과 달리 확인창이 한 번만 뜬다. */
 function resetProject() {
   const hasWork = S.media.length || S.texts.length;
-  if (hasWork && !confirm('지금 작업을 모두 지우고 처음부터 시작할까요?\n\n저장하지 않은 편집 내용은 사라집니다.')) return;
+  if (hasWork && !confirm('지금 작업을 모두 지우고 처음부터 시작할까요?\n\n자동 저장된 내용까지 함께 지워지며 되돌릴 수 없습니다.')) return;
 
   setPlaying(false);
   // 기록도 함께 비운다 — 지운 작업으로 되돌아가면 혼란스럽다
@@ -3462,7 +3715,10 @@ function resetProject() {
   S.media = []; S.clips = []; S.texts = []; S.audio = []; S.overlays = [];
   S.playhead = 0; S.selected = null;
   S.aspect = '16:9'; S.fit = 'blur'; S.cropY = 0.5;
-  lastClipId = null;
+  lastClipByMedia.clear();
+  clearTimeout(autosaveTimer);
+  idbClear('project'); idbClear('media');
+  markSaved(false);
 
   applyAspect();
   renderMediaList();
@@ -3479,6 +3735,11 @@ $('propsBody').addEventListener('pointerdown', (e) => {
 $('propsBody').addEventListener('keydown', (e) => {
   if (e.target.closest('input, select, textarea')) pushHistory();
 }, true);
+/* 슬라이더 같은 잔 조작은 syncAll을 거치지 않는 경우가 많아
+   여기서 한 번 더 걸어 자동 저장이 놓치는 일이 없게 한다. */
+$('propsBody').addEventListener('input', (e) => {
+  if (e.target.closest('input, select, textarea')) scheduleAutosave();
+});
 
 $('btnUndo').onclick = undo;
 $('btnRedo').onclick = redo;
@@ -3550,7 +3811,7 @@ function updateZoom() {
 $('btnTheme').onclick = () => {
   const dark = document.documentElement.getAttribute('data-theme') !== 'light';
   document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
-  $('btnTheme').textContent = dark ? '어둡게' : '밝게';
+  $('btnTheme').textContent = dark ? '☀️ 밝게' : '🌙 어둡게';
 };
 
 $('btnHelp').onclick = () => {
@@ -3630,6 +3891,9 @@ setInterval(() => {
 
 // 레이아웃이 완전히 잡힌 뒤 한 번 더
 window.addEventListener('load', () => { fitPreview(); requestRender(); });
+
+// 저장해 둔 작업이 있으면 물어본다 (실패해도 빈 편집기로 그냥 시작한다)
+tryResumeProject().catch(() => {});
 
 })();
 </script>
