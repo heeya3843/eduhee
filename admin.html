@@ -141,9 +141,8 @@ textarea{resize:vertical;min-height:64px;line-height:1.6}
     <div class="steps">
       <b>👁 보여줄 자료만 골라 공개하기</b>
       <ol>
-        <li>아래 목록에서 각 자료 왼쪽 <b>👁 표시 / 🙈 숨김</b> 버튼을 눌러 강의실에 보일지 말지 정합니다.</li>
+        <li>아래 목록에서 각 자료 왼쪽 <b>👁 표시 / 🙈 숨김</b> 버튼을 누르면 <b>바로 강의실에 반영</b>됩니다. 파일을 내려받거나 다시 올릴 필요가 없습니다.</li>
         <li><b>🙈 숨김</b>으로 둔 자료는 교육생 강의실에서 <b>안 보입니다</b> (삭제가 아니라 잠시 숨김).</li>
-        <li>다 고른 뒤 아래 <b>[materials.js 내려받기]</b> → 받은 파일을 강사(제작자)에게 주시거나, 사이트 폴더의 materials.js 위에 덮어써 다시 올리면 반영됩니다.</li>
       </ol>
       <b style="margin-top:12px">📌 새 자료 추가 순서</b>
       <ol>
@@ -222,7 +221,7 @@ textarea{resize:vertical;min-height:64px;line-height:1.6}
 
   <div class="dlbar">
     <div class="wrap">
-      <div class="msg">변경한 내용은 <b>파일을 내려받아 교체해야</b> 저장됩니다.</div>
+      <div class="msg"><b>👁/🙈 숨김·표시는 즉시 반영</b>됩니다. 자료 추가·삭제·순서변경은 <b>파일을 내려받아 교체해야</b> 저장됩니다.</div>
       <button class="btn btn-gray" onclick="location.reload()">되돌리기</button>
       <button class="btn btn-save" onclick="download()">⬇ materials.js 내려받기</button>
     </div>
@@ -232,6 +231,9 @@ textarea{resize:vertical;min-height:64px;line-height:1.6}
 <script src="materials.js"></script>
 <script>
 var ADMIN_PASSWORD = '4911';   /* ← 관리자 암호. 바꾸려면 이 따옴표 안만 고치세요 */
+
+var SB_URL='https://yzycbpugeswycjouldmd.supabase.co';
+var SB_KEY='sb_publishable__8L_fRWrQQNhKjNDl60EGw_Bha5cuCv';
 
 var DATA = [], PW = '';
 
@@ -256,7 +258,30 @@ function render(){
       +'</div>';
   }).join('');
 }
-function toggleHide(i){ DATA[i].hidden = !DATA[i].hidden; render(); }
+function toggleHide(i){
+  DATA[i].hidden = !DATA[i].hidden;
+  render();
+  fetch(SB_URL+'/rest/v1/rpc/admin_set_material_visibility',{
+    method:'POST',
+    headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},
+    body:JSON.stringify({pw:ADMIN_PASSWORD, p_url:DATA[i].url, p_hidden:DATA[i].hidden})
+  }).then(function(r){
+    if(!r.ok){ alert('강의실 반영에 실패했습니다. 다시 눌러 주세요.'); DATA[i].hidden=!DATA[i].hidden; render(); }
+  }).catch(function(){
+    alert('강의실 반영에 실패했습니다. 인터넷 연결을 확인해 주세요.'); DATA[i].hidden=!DATA[i].hidden; render();
+  });
+}
+
+function loadVisibilityOverrides(){
+  return fetch(SB_URL+'/rest/v1/classroom_material_visibility?select=material_url,hidden',{
+    headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}
+  }).then(function(r){ return r.ok ? r.json() : []; })
+    .then(function(rows){
+      var map={}; (rows||[]).forEach(function(r){ map[r.material_url]=r.hidden; });
+      DATA.forEach(function(m){ if(map.hasOwnProperty(m.url)) m.hidden = !!map[m.url]; });
+    })
+    .catch(function(){});
+}
 
 function addItem(){
   var c=q('i_course').value.trim(), t=q('i_title').value.trim(), u=q('i_url').value.trim();
@@ -364,6 +389,7 @@ function enter(){
   PW = (typeof CLASSROOM_PASSWORD !== 'undefined') ? CLASSROOM_PASSWORD : '';
   q('i_pw').value = PW;
   render();
+  loadVisibilityOverrides().then(render);
 }
 
 q('gform').addEventListener('submit',function(e){

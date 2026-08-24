@@ -134,6 +134,20 @@ footer b{color:#CBD5E1}
 <script src="materials.js"></script>
 <script>
 var KEY='eduhee_classroom_ok';
+var SB_URL='https://yzycbpugeswycjouldmd.supabase.co';
+var SB_KEY='sb_publishable__8L_fRWrQQNhKjNDl60EGw_Bha5cuCv';
+
+function loadVisibilityOverrides(){
+  return fetch(SB_URL+'/rest/v1/classroom_material_visibility?select=material_url,hidden',{
+    headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}
+  }).then(function(r){ return r.ok ? r.json() : []; })
+    .then(function(rows){
+      if(typeof MATERIALS === 'undefined' || !MATERIALS.length) return;
+      var map={}; (rows||[]).forEach(function(r){ map[r.material_url]=r.hidden; });
+      MATERIALS.forEach(function(m){ if(map.hasOwnProperty(m.url)) m.hidden = !!map[m.url]; });
+    })
+    .catch(function(){});
+}
 
 function render(){
   var box=document.getElementById('list');
@@ -177,6 +191,7 @@ function enter(){
   document.getElementById('gate').style.display='none';
   document.getElementById('room').style.display='block';
   render();
+  loadVisibilityOverrides().then(render);
 }
 function signOut(){
   try{sessionStorage.removeItem(KEY);}catch(e){}
