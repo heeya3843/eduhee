@@ -143,6 +143,15 @@ const MATERIALS = [
     date:   '2026.07',
   },
 
+  {
+    course: '동구청 AI동아리 특강',
+    title:  '동구청 AI동아리 특강자료',
+    desc:   '보건소 공무원이 6개월간 검증한 AI 업무활용 38건 실전 사례 특강자료 (10쪽)',
+    type:   'PPT',
+    url:    'files/donggu_ai_club_0826.pptx',
+    date:   '2026.08.26',
+  },
+
   /* ── 영상 실습 자료 (쇼츠 만들기) ── */
   {
     course: '🎬 영상 실습 자료 (쇼츠 만들기)',
