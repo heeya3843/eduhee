@@ -334,14 +334,13 @@ function download(){
   d.scrollIntoView({behavior:'smooth',block:'center'});
 }
 
-/* ══ 후기 관리 (Supabase) ══ */
-var SB_URL='https://yzycbpugeswycjouldmd.supabase.co';
-var SB_KEY='sb_publishable__8L_fRWrQQNhKjNDl60EGw_Bha5cuCv';
+/* ══ 후기 관리 (Google Sheets) ══ */
+var GAS_URL='https://script.google.com/macros/s/AKfycbzAa0p1xj3_sk-35xoEjvuEjv66RoRmZNwZHY5XmNXbpgrN4EVfpRzD_n375s22mu2C9Q/exec';
 
-function sbRpc(fn,body){
-  return fetch(SB_URL+'/rest/v1/rpc/'+fn,{
+function gasPost(body){
+  return fetch(GAS_URL,{
     method:'POST',
-    headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json'},
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
     body:JSON.stringify(body)
   });
 }
@@ -349,7 +348,7 @@ function rvDate(s){ try{var d=new Date(s);return d.getFullYear()+'.'+String(d.ge
 
 function rvAdminLoad(){
   var box=q('rvAdminList');
-  sbRpc('admin_list_reviews',{pw:ADMIN_PASSWORD})
+  gasPost({action:'list', pw:ADMIN_PASSWORD})
    .then(function(r){ return r.ok?r.json():Promise.reject(); })
    .then(function(rows){
       rows=rows||[];
@@ -371,12 +370,12 @@ function rvAdminLoad(){
    .catch(function(){ box.innerHTML='<div class="none">후기를 불러오지 못했습니다.</div>'; });
 }
 function rvToggle(id,val){
-  sbRpc('admin_set_review_approved',{pw:ADMIN_PASSWORD,review_id:id,val:val})
+  gasPost({action:'approve', pw:ADMIN_PASSWORD, id:id, value:val})
    .then(function(r){ if(r.ok) rvAdminLoad(); else alert('변경에 실패했습니다.'); });
 }
 function rvDelete(id){
   if(!confirm('이 후기를 완전히 삭제할까요?\n삭제하면 되돌릴 수 없습니다.')) return;
-  sbRpc('admin_delete_review',{pw:ADMIN_PASSWORD,review_id:id})
+  gasPost({action:'delete', pw:ADMIN_PASSWORD, id:id})
    .then(function(r){ if(r.ok) rvAdminLoad(); else alert('삭제에 실패했습니다.'); });
 }
 

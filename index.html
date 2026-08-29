@@ -735,9 +735,8 @@ document.addEventListener('keydown',function(e){
   else if(e.key==='ArrowLeft')lbNav(-1);
 });
 
-/* ══ 강의 후기 (Supabase) ══ */
-var SB_URL='https://yzycbpugeswycjouldmd.supabase.co';
-var SB_KEY='sb_publishable__8L_fRWrQQNhKjNDl60EGw_Bha5cuCv';
+/* ══ 강의 후기 (Google Sheets) ══ */
+var GAS_URL='https://script.google.com/macros/s/AKfycbzAa0p1xj3_sk-35xoEjvuEjv66RoRmZNwZHY5XmNXbpgrN4EVfpRzD_n375s22mu2C9Q/exec';
 var rvRating=5, rvAll=[], rvShown=4;
 
 function rvEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];});}
@@ -773,8 +772,7 @@ function rvRender(){
 function rvShowAll(){ rvShown=rvAll.length; rvRender(); }
 
 function rvLoad(){
-  fetch(SB_URL+'/rest/v1/reviews?select=name,org,course,rating,content,created_at&approved=eq.true&order=created_at.desc',
-    {headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}})
+  fetch(GAS_URL)
   .then(function(r){return r.ok?r.json():[];})
   .then(function(d){ rvAll=d||[]; rvRender(); })
   .catch(function(){ document.getElementById('rvList').innerHTML='<div class="rv-empty">후기를 불러오지 못했습니다. 잠시 후 다시 열어주세요.</div>'; });
@@ -802,14 +800,15 @@ document.getElementById('rvForm').addEventListener('submit',function(e){
   if(name.length<1){ msg.className='rv-msg err'; msg.textContent='성함을 입력해 주세요.'; return; }
   if(content.length<5){ msg.className='rv-msg err'; msg.textContent='후기 내용을 5자 이상 적어주세요.'; return; }
   btn.disabled=true; btn.textContent='등록 중…';
-  fetch(SB_URL+'/rest/v1/reviews',{
+  fetch(GAS_URL,{
     method:'POST',
-    headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
     body:JSON.stringify({
+      action:'submit',
       name:name,
       org:document.getElementById('rvOrg').value.trim()||null,
       course:document.getElementById('rvCourse').value||null,
-      rating:rvRating, content:content, approved:false
+      rating:rvRating, content:content
     })
   }).then(function(r){
     if(r.ok){
